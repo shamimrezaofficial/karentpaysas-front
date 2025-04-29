@@ -50,7 +50,7 @@ export default async function Home() {
   }
   return (
     <section>
-      <MerchantLogin />
+      <MerchantLogin settingsData={settingsData} />
       <Slider sliderData={sliderData} />
       <Features featuresData={featuresData} />
       <PaymentGatewayComponent />

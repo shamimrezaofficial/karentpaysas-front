@@ -149,7 +149,7 @@ function AllowedIpPage() {
               ))
           : Array.isArray(visibleTransactions) &&
             visibleTransactions?.map((item, index) => (
-              <tr key={visibleTransactions?.length + index} className="table_tr">
+              <tr key={index} className="table_tr">
                 <td className="px-6 py-4 whitespace-nowrap">
                 {totalItems - ((currentPage - 1) * itemsPerPage + index)}
                 </td>

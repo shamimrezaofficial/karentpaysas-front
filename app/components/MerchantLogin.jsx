@@ -24,7 +24,6 @@ function MerchantLogin() {
         Cookies.set("auth_token_font", id);
         window.localStorage.setItem("auth_token_font", id);
       }
-
       toast.success("Successfully Logged In");
 
       setTimeout(() => {

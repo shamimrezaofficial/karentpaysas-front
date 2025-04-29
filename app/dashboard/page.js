@@ -12,9 +12,11 @@ import {
   MdTrendingDown,
 } from "react-icons/md";
 import ApiRequest from "../lib/Api_request";
+import useUserData from "../lib/useUserData";
 function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [allbalance, setAllbalance] = useState(null);
+  const { user } = useUserData();
 
   useEffect(() => {
     getallBalance();
@@ -31,7 +33,7 @@ function DashboardPage() {
       setAllbalance(response?.data);
     }
   };
-  const balanceItems = [
+  const merchantBalanceItems = [
     {
       transaction: allbalance?.balance?.main_balance || 0.0,
       title: "Main Balance",
@@ -129,22 +131,72 @@ function DashboardPage() {
       link: "/dashboard/payout",
     },
   ];
+  const adminBalanceItems = [
+    {
+      transaction: 0.0,
+      title: "Total Balance",
+      color: "text-blue-500",
+      gridSize: "md:col-span-3 bg-gray-50",
+      icon: MdAccountBalanceWallet,
+    },
+    {
+      transaction: 0.0,
+      title: "Total Merchant",
+      color: "text-green-500",
+      gridSize: "md:col-span-3",
+      icon: MdCreditCard,
+    },
+    {
+      transaction: 0.0,
+      title: "Total Deposit",
+      color: "text-yellow-500",
+      gridSize: "md:col-span-3",
+      icon: MdArrowDownward,
+    },
+    {
+      transaction: 0.0,
+      title: "Total Payout",
+      color: "text-purple-500",
+      gridSize: "md:col-span-3",
+      icon: MdTrendingUp,
+    },
+    {
+      transaction: 0.0,
+      title: "Total Settlement",
+      color: "text-green-700",
+      gridSize: "md:col-span-3",
+      icon: MdAttachMoney,
+    },
+  ];
+  console.log(user);
   return (
     <section className="text-white shadow-md rounded border border-gray-200">
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-5">
-          {balanceItems?.map((item, index) => (
-            <DashboardCard
-              key={index}
-              title={item.title}
-              amount={item.transaction}
-              color={item.color}
-              gridSize={item.gridSize}
-              loading={loading}
-              icon={item.icon}
-              link={item.link}
-            />
-          ))}
+          {user?.roles?.some((role) => role.name === "Admin")
+            ? adminBalanceItems?.map((item, index) => (
+                <DashboardCard
+                  key={index}
+                  title={item.title}
+                  amount={item.transaction}
+                  color={item.color}
+                  gridSize={item.gridSize}
+                  loading={loading}
+                  icon={item.icon}
+                />
+              ))
+            : merchantBalanceItems?.map((item, index) => (
+                <DashboardCard
+                  key={index}
+                  title={item.title}
+                  amount={item.transaction}
+                  color={item.color}
+                  gridSize={item.gridSize}
+                  loading={loading}
+                  icon={item.icon}
+                  link={item.link}
+                />
+              ))}
         </div>
       </div>
     </section>

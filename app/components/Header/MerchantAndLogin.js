@@ -36,19 +36,6 @@ function MerchantAndLogin({ user, authToken, adminUrl }) {
       window.document.removeEventListener("click", handleClickOutsideOperator);
     };
   }, []);
-
-  /*   const loginAdmin = (user) => {
-    if (
-      user?.roles?.some(
-        (role) => role.name === "Merchant" || role.name === "Admin"
-      )
-    ) {
-      window.open(
-        `${adminUrl}/login?email=${user?.email}&secret_pass=${secret_pass}`,
-        "_blank"
-      );
-    }
-  }; */
   const loginAdmin = (user) => {
     if (
       user?.roles?.some(
@@ -56,7 +43,6 @@ function MerchantAndLogin({ user, authToken, adminUrl }) {
       )
     ) {
       const adminWindow = window.open(adminUrl+"/login", "_blank");
-
       const data = {
         email: user?.email,
         secret_pass: secret_pass,
@@ -120,7 +106,7 @@ function MerchantAndLogin({ user, authToken, adminUrl }) {
                 </li>
 
                 {user?.roles?.some(
-                  (role) => role.name === "Merchant" || role.name === "Admin"
+                  (role) => role.name === "Admin"
                 ) && (
                   <li>
                     <h2
