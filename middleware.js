@@ -31,11 +31,14 @@ export async function middleware(req) {
     { href: "/dashboard/payout", roles: ["Merchant"] },
     { href: "/dashboard/settlement", roles: ["Merchant"] },
     { href: "/dashboard/payments", roles: ["Merchant"] },
-    { href: "/dashboard/statement", roles: ["Merchant"] },
+    { href: "/dashboard/statement", roles: ["Admin"] },
     { href: "/dashboard/developer", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/support", roles: ["Merchant"] },
     { href: "/dashboard/reports", roles: ["Merchant"] },
-    { href: "/dashboard/settings", roles: ["Admin"] },
+    { href: "/dashboard/own-merchant-apply", roles: ["Admin"] },
+    { href: "/dashboard/settings", roles: ["Merchant", "Admin"] },
+    { href: "/dashboard/settings/payment", roles: ["Admin"] },
+    { href: "/dashboard/settings/allowed-ip", roles: ["Admin"] },
   ];
 
   const hasRole = (roleNames = []) =>

@@ -248,6 +248,27 @@ export function DrawerDialogDemo({ open, setOpen }) {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        const clickTargets = [
+          { id: "companyType", setter: setShowIdentityOfCompany },
+          { id: "industry", setter: setShowBusinessType },
+        ];
+  
+        clickTargets.forEach(({ id, setter }) => {
+          if (!event.target.closest(`#${id}`)) {
+            setter(false);
+          }
+        });
+      };
+  
+      document.addEventListener("click", handleClickOutside);
+  
+      return () => {
+        document.removeEventListener("click", handleClickOutside);
+      };
+    }, []);
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full h-full bg-black/40">
       <div className="relative w-full max-w-3xl max-h-full  bg-white rounded-lg text-black">
@@ -262,8 +283,8 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   setShowDeopDownManu={setShowIdentityOfCompany}
                   showData={identityOfCompany?.company_name}
                   setShowData={setIdentityOfCompany}
-                  label="Industry/Business Type"
-                  id="industry"
+                  label="Company Type"
+                  id="companyType"
                   required={true}
                   error={errors.identityOfCompany}
                 >

@@ -17,6 +17,7 @@ import { IoSettings } from "react-icons/io5";
 import { MdDeveloperMode } from "react-icons/md";
 import useFetchingData from "@/app/lib/useFetchingData";
 import useUserData from "@/app/lib/useUserData";
+import { RiUserSettingsLine } from "react-icons/ri";
 
 function DashboardSideBer() {
   const [scrollDirection, setScrollDirection] = useState("up");
@@ -110,7 +111,7 @@ function DashboardSideBer() {
       href: "/dashboard/statement",
       icon: <MdAccountBalance className="mr-2 text-2xl" />,
       label: "Statement Balance",
-      roles: ["Merchant"],
+      roles: ["Admin"],
     },
     {
       href: "/dashboard/developer",
@@ -131,10 +132,16 @@ function DashboardSideBer() {
       roles: ["Merchant"],
     },
     {
+      href: "/dashboard/own-merchant-apply",
+      icon: <RiUserSettingsLine className="mr-2 text-2xl" />,
+      label: "Own Merchant Apply",
+      roles: ["Admin"],
+    },
+    {
       href: "/dashboard/settings",
       icon: <IoSettings className="mr-2 text-2xl" />,
       label: "Settings",
-      roles: ["Admin"],
+      roles: ["Merchant", "Admin"],
     },
   ];
 
@@ -163,7 +170,7 @@ function DashboardSideBer() {
               href={item.href}
               icon={item.icon}
               label={item.label}
-              active={pathname.startsWith(item.href)}
+              active={pathname === item.href}
             />
           ))}
         </ul>

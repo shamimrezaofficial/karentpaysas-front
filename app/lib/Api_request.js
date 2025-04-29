@@ -50,7 +50,6 @@ const ApiRequest = async ({ url, formdata = null, method = "post", type = "appli
       redirect("/auth/login");
       return;
     }
-    // console.log("Api Connection Failed, Please check your connection or reload the page");
     //return response;         
 
   }

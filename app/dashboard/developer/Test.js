@@ -107,7 +107,7 @@ const Test = () => {
                     <span
                       onClick={() =>
                         navigator?.clipboard
-                          .writeText(key?.public_key)
+                          .writeText(key?.privet_key)
                           .then(() => {
                             toast.success("Copied successfully!", {
                               position: "top-center",
