@@ -25,7 +25,7 @@ const Test = () => {
     getTestKey();
   }, []);
   return (
-    <div className="mx-auto mt-5">
+    <div className="mx-auto mt-5 px-3 pb-3">
       <div className="w-full border border-gray-200 p-3 mt-3 rounded-md lg:flex items-center justify-between">
         <h3 className="text-xl font-semibold">API keys</h3>
         <Link className="" href="/documentations" prefetch={false}>

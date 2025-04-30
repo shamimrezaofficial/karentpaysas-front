@@ -121,17 +121,44 @@ export default function Production() {
   return (
     <div className="mt-5 bg-white">
       {user?.roles?.some((role) => role.name === "Admin") && (
-        <div className="w-full border border-gray-200 p-3 mt-3 rounded-md flex items-center justify-between flex-wrap gap-2">
-          <h3 className="text-xl font-semibold"> API keys</h3>
-          <Link className="" href="/documentations" prefetch={false}>
-            <span className="text-sm text-[#2F65EC] font-medium flex items-center">
-              API Documentation <IoIosArrowRoundForward fontSize={20} />
-            </span>
-          </Link>
+        <div className="px-3">
+          <div className="w-full border border-gray-200 p-3 rounded-md flex items-center justify-between flex-wrap gap-2">
+            <h3 className="text-xl font-semibold"> API keys</h3>
+            <Link className="" href="/documentations" prefetch={false}>
+              <span className="text-sm text-[#2F65EC] font-medium flex items-center">
+                API Documentation <IoIosArrowRoundForward fontSize={20} />
+              </span>
+            </Link>
+          </div>
+          {Array.isArray(filteredData) && filteredData?.length > 0 && (
+            <div className="py-5">
+              <FilterStatus
+                showMerchantStatus={showPaymentType}
+                setShowMerchantStatus={setShowPaymentType}
+                setSearchMerchantStatus={setPaymentType}
+                searchMerchantStatus={paymentType ? paymentType : ""}
+                id="setShowPaymentType"
+                placeholderText="Merchant API..."
+              >
+                {["Own Merchant API", "Merchant API"]?.map((item, index) => (
+                  <div
+                    key={index}
+                    className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                    onClick={() => {
+                      setPaymentType(item);
+                      setShowPaymentType(false);
+                    }}
+                  >
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </FilterStatus>
+            </div>
+          )}
         </div>
       )}
       {data === null && (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto px-3">
           <div className="m-5">
             <h1>
               {" "}
@@ -146,31 +173,6 @@ export default function Production() {
               </button>
             </h1>
           </div>
-        </div>
-      )}
-      {Array.isArray(filteredData) && filteredData?.length > 0 && (
-        <div className="py-5">
-          <FilterStatus
-            showMerchantStatus={showPaymentType}
-            setShowMerchantStatus={setShowPaymentType}
-            setSearchMerchantStatus={setPaymentType}
-            searchMerchantStatus={paymentType ? paymentType : ""}
-            id="setShowPaymentType"
-            placeholderText="Merchant API..."
-          >
-            {["Own Merchant API", "Merchant API"]?.map((item, index) => (
-              <div
-                key={index}
-                className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
-                onClick={() => {
-                  setPaymentType(item);
-                  setShowPaymentType(false);
-                }}
-              >
-                <span>{item}</span>
-              </div>
-            ))}
-          </FilterStatus>
         </div>
       )}
       <Table headers={headers}>
@@ -203,7 +205,7 @@ export default function Production() {
 
       {Array.isArray(filteredKeys) &&
         filteredKeys?.map((key, index) => (
-          <div key={index} className="mt-5  border border-gray-200 rounded-md">
+          <div key={index} className="m-3 border border-gray-200 rounded-md">
             <div className="border-b border-gray-200 lg:p-4 text-center flex p-4 justify-between lg:flex md:flex items-center  lg:justify-between md:justify-between">
               <h3 className="text-sm lg:text-xl font-semibold  ">
                 {key?.business_name}

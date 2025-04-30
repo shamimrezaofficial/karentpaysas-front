@@ -10,7 +10,7 @@ export default function DeveloperPage() {
 
   return (
 
-    <div className=" bg-white rounded-md pt-3 ml-0  p-2 border border-gray-200">
+    <div className=" bg-white rounded-md border border-gray-200">
       <HeaderDeveloper
         setIsOn={setIsOn}
         isOn={isOn}

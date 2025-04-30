@@ -5,7 +5,7 @@ function HeaderDeveloper({ isOn, setIsOn}) {
   };
 
   return (
-    <div className="w-full pt-1 ">
+    <div className="w-full pt-3 px-2">
       <div className="py-4 pb-6 text-center lg:hidden ">
         <h3 className="text-xl font-semibold">Developer</h3>
       </div>

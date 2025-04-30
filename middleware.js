@@ -38,7 +38,7 @@ export async function middleware(req) {
     { href: "/dashboard/own-merchant-apply", roles: ["Admin"] },
     { href: "/dashboard/settings", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/settings/payment", roles: ["Admin"] },
-    { href: "/dashboard/settings/allowed-ip", roles: ["Admin"] },
+    { href: "/dashboard/settings/allowed-ip", roles: ["Merchant","Admin"] },
   ];
 
   const hasRole = (roleNames = []) =>

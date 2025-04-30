@@ -21,29 +21,26 @@ function SettingMenu() {
         </Link>
       )}
       {hasRole(["Admin"]) && (
-        <>
-          <Link
-            href="/dashboard/settings/payment"
-            className={`cursor-pointer rounded p-2 w-full text-center sm:w-fit ${
-              pathName === "/dashboard/settings/payment" ? "bg-gradient-2" : ""
-            }`}
-            prefetch={false}
-          >
-            Payment Settings
-          </Link>
-
-          <Link
-            href="/dashboard/settings/allowed-ip"
-            className={`cursor-pointer rounded p-2 w-full text-center sm:w-fit ${
-              pathName === "/dashboard/settings/allowed-ip"
-                ? "bg-gradient-2"
-                : ""
-            }`}
-            prefetch={false}
-          >
-            Allowed IP
-          </Link>
-        </>
+        <Link
+          href="/dashboard/settings/payment"
+          className={`cursor-pointer rounded p-2 w-full text-center sm:w-fit ${
+            pathName === "/dashboard/settings/payment" ? "bg-gradient-2" : ""
+          }`}
+          prefetch={false}
+        >
+          Payment Settings
+        </Link>
+      )}
+      {hasRole(["Merchant", "Admin"]) && (
+        <Link
+          href="/dashboard/settings/allowed-ip"
+          className={`cursor-pointer rounded p-2 w-full text-center sm:w-fit ${
+            pathName === "/dashboard/settings/allowed-ip" ? "bg-gradient-2" : ""
+          }`}
+          prefetch={false}
+        >
+          Allowed IP
+        </Link>
       )}
     </>
   );
