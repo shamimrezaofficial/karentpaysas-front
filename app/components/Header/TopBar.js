@@ -34,7 +34,6 @@ const TopBar = async () => {
       // console.log(error);
     }
   }
-
   return (
     <section
       className="h-auto  py-2"
@@ -61,7 +60,7 @@ const TopBar = async () => {
           </Link>
 
           <div className="flex items-center gap-3">
-            {user?.roles[0]?.name === "Admin" && <BecomeMerchant />}
+            {user?.roles[0]?.name === "Admin" || user?.roles[0]?.name === "Merchant" ? <BecomeMerchant user={user}/> : null}
 
             {user ? (
               <MerchantAndLogin user={user} authToken={token} adminUrl={logoIdentity?.settings?.adminUrl}/>

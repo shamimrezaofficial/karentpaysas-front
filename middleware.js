@@ -35,7 +35,7 @@ export async function middleware(req) {
     { href: "/dashboard/developer", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/support", roles: ["Merchant"] },
     { href: "/dashboard/reports", roles: ["Merchant"] },
-    { href: "/dashboard/own-merchant-apply", roles: ["Admin"] },
+    // { href: "/dashboard/own-merchant-apply", roles: ["Admin"] },
     { href: "/dashboard/settings", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/settings/payment", roles: ["Admin"] },
     { href: "/dashboard/settings/allowed-ip", roles: ["Merchant","Admin"] },

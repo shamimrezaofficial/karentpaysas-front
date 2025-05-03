@@ -131,12 +131,12 @@ function DashboardSideBer() {
       label: "Reports",
       roles: ["Merchant"],
     },
-    {
+    /* {
       href: "/dashboard/own-merchant-apply",
       icon: <RiUserSettingsLine className="mr-2 text-2xl" />,
       label: "Own Merchant Apply",
       roles: ["Admin"],
-    },
+    }, */
     {
       href: "/dashboard/settings",
       icon: <IoSettings className="mr-2 text-2xl" />,

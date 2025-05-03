@@ -6,11 +6,14 @@ import Button from "@/app/ui/Button";
 import ApiRequest from "@/app/lib/Api_request";
 import SelectDrpodownManu from "@/app/ui/SelectDrpodownManu";
 import ModalHeader from "@/app/ui/ModalHeader";
+import Cookies from "js-cookie";
 import countries from "@/public/countries.json";
 import { FaTimes } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa6";
 
-function StepIndicator({ step }) {
+function StepIndicator({ step, user }) {
+  const isAdmin = user?.roles?.[0]?.name === "Admin";
+  
   return (
     <div className="flex items-center justify-around py-4">
       <div className="flex flex-col items-center gap-1">
@@ -22,41 +25,48 @@ function StepIndicator({ step }) {
           1
         </div>
         <div className="text-center">
-          Business <br></br>Structure
+          Business <br /> Structure
         </div>
       </div>
+      
+      {isAdmin && (
+        <>
+          <span
+            className={`w-48 h-[2px] mb-12 ${
+              step >= 2 ? "bg-[#7073F3]" : "bg-gray-300"
+            }`}
+          />
+          <div className="flex flex-col items-center gap-1">
+            <div
+              className={`w-8 h-8 flex items-center justify-center rounded-full ${
+                step >= 2 ? "bg-[#7073F3] text-white" : "bg-gray-300"
+              }`}
+            >
+              2
+            </div>
+            <div className="text-center">
+              Business <br /> Representative
+            </div>
+          </div>
+        </>
+      )}
+      
       <span
         className={`w-48 h-[2px] mb-12 ${
-          step >= 2 ? "bg-[#7073F3]" : "bg-gray-300"
+          step >= (isAdmin ? 3 : 2) ? "bg-[#7073F3]" : "bg-gray-300"
         }`}
       />
+      
       <div className="flex flex-col items-center gap-1">
         <div
           className={`w-8 h-8 flex items-center justify-center rounded-full ${
-            step >= 2 ? "bg-[#7073F3] text-white" : "bg-gray-300"
+            step >= (isAdmin ? 3 : 2) ? "bg-[#7073F3] text-white" : "bg-gray-300"
           }`}
         >
-          2
+          {isAdmin ? 3 : 2}
         </div>
         <div className="text-center">
-          Business <br></br> Representative
-        </div>
-      </div>
-      <span
-        className={`w-48 h-[2px] mb-12 ${
-          step >= 3 ? "bg-[#7073F3]" : "bg-gray-300"
-        }`}
-      />
-      <div className="flex flex-col items-center gap-1">
-        <div
-          className={`w-8 h-8 flex items-center justify-center rounded-full ${
-            step >= 3 ? "bg-[#7073F3] text-white" : "bg-gray-300"
-          }`}
-        >
-          3
-        </div>
-        <div className="text-center">
-          Business <br></br> Details
+          Business <br /> Details
         </div>
       </div>
     </div>
@@ -67,17 +77,18 @@ export function DrawerDialogDemo({ open, setOpen }) {
   const dropdownRef = useRef(null);
   if (!open) return null;
   const [step, setStep] = useState(1);
+  const [user, setUser] = useState(null);
 
   // Profile Form CODE
-  const [company, setcompany] = useState([]);
-  const [industry, setindustry] = useState([]);
-  const [identityOfCompany, setIdentityOfCompany] = useState("");
+  const [company, setCompany] = useState([]);
+  const [industry, setIndustry] = useState([]);
+  const [identityOfCompany, setIdentityOfCompany] = useState(null);
   const [showIdentityOfCompany, setShowIdentityOfCompany] = useState(false);
   const [productDescription, setProductDescription] = useState("");
-  const [businessType, setBusinessType] = useState("");
+  const [businessType, setBusinessType] = useState(null);
   const [showBusinessType, setShowBusinessType] = useState(false);
 
-  // AdditionalIn fo Form code
+  // Additional Info Form code
   const [fullName, setFullName] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -86,49 +97,69 @@ export function DrawerDialogDemo({ open, setOpen }) {
   const [showCountryList, setShowCountryList] = useState(false);
   const [countryId, setCountryId] = useState(0);
   const [phoneCode, setPhoneCode] = useState("+00");
+  const [showPassword, setShowPassword] = useState(false);
 
   // BusinessInfoForm fo Form code
   const [businessName, setBusinessName] = useState("");
   const [address, setAddress] = useState("");
   const [webAddress, setWebAddress] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   const handleCountryClick = (country) => {
     setSearchTerm(country.name);
     setCountryId(country.id);
-    setPhoneCode(country ? country.phone_code : "+00");
+    setPhoneCode(country.phone_code);
     setShowCountryList(false);
   };
+
   const filteredCountries = countries?.filter((country) =>
     country.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const token = Cookies.get("auth_token_font");
 
   useEffect(() => {
     getUser();
   }, []);
 
   const getUser = async () => {
+    if (!token) return;
+    const response = await ApiRequest({
+      url: "/user",
+      method: "get",
+    });
+    if (response?.status === 200) {
+      setUser(response?.data?.user);
+    }
+  };
+
+  useEffect(() => {
+    getBusinessStructure();
+  }, []);
+
+  const getBusinessStructure = async () => {
     const response = await ApiRequest({
       url: "/business_structure",
       method: "get",
     });
-    if (response?.status == 200) {
-      setcompany(response?.data?.company);
-      setindustry(response?.data?.industry);
-    } else {
+    if (response?.status === 200) {
+      setCompany(response?.data?.company);
+      setIndustry(response?.data?.industry);
     }
   };
 
   const [errors, setErrors] = useState({});
+  
   const validateStep1 = () => {
     const newErrors = {};
-    if (!identityOfCompany?.id)
+    if (!identityOfCompany?.id) {
       newErrors.identityOfCompany = "Please select a company identity.";
-    if (!businessType?.id)
+    }
+    if (!businessType?.id) {
       newErrors.businessType = "Please select a business type.";
+    }
     setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
+    return Object.keys(newErrors).length === 0;
   };
 
   const validateStep2 = () => {
@@ -143,7 +174,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
     if (!phoneNumber) newErrors.phoneNumber = "Please enter a phone number.";
     if (!password) newErrors.password = "Please enter a password.";
     setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleNext = () => {
@@ -152,7 +183,11 @@ export function DrawerDialogDemo({ open, setOpen }) {
         setStep((prev) => prev + 1);
       }
     } else if (step === 2) {
-      if (validateStep2()) {
+      if (user?.roles?.[0]?.name === "Admin") {
+        if (validateStep2()) {
+          setStep((prev) => prev + 1);
+        }
+      } else {
         setStep((prev) => prev + 1);
       }
     }
@@ -164,26 +199,26 @@ export function DrawerDialogDemo({ open, setOpen }) {
 
   const validateStep3 = () => {
     const newErrors = {};
-    if (!businessName)
+    if (!businessName) {
       newErrors.businessName = "Please enter the business name.";
-    if (!address) newErrors.address = "Please provide an address.";
-    if (!webAddress) newErrors.webAddress = "Please provide a web address.";
-    if (webAddress) {
-      if (!isValidUrl(webAddress)) {
-        newErrors.webAddress = "Please enter a valid URL.";
-      }
+    }
+    if (!address) {
+      newErrors.address = "Please provide an address.";
+    }
+    if (!webAddress) {
+      newErrors.webAddress = "Please provide a web address.";
+    } else if (!isValidUrl(webAddress)) {
+      newErrors.webAddress = "Please enter a valid URL.";
     }
     setErrors(newErrors);
-    return Object.keys(newErrors)?.length === 0;
+    return Object.keys(newErrors).length === 0;
   };
 
   const isValidUrl = (url) => {
     try {
-      // Create a new URL object
       new URL(url);
       return true;
     } catch {
-      // Invalid URL
       return false;
     }
   };
@@ -191,32 +226,40 @@ export function DrawerDialogDemo({ open, setOpen }) {
   const handleSubmit = async () => {
     if (validateStep3()) {
       setLoading(true);
-      const form_data = new FormData();
+      const formData = new FormData();
 
-      form_data.append("company", identityOfCompany?.id);
-      form_data.append("industry", businessType?.id);
-      form_data.append("description", productDescription);
-      form_data.append("name", fullName);
-      form_data.append("email", emailAddress);
-      form_data.append("country", countryId);
-      form_data.append("phone", phoneNumber);
-      form_data.append("password", password);
-      form_data.append("confirmPassword", password);
-      form_data.append("business_name", businessName);
-      form_data.append("address", address);
-      form_data.append("web_address", webAddress);
+      formData.append("company", identityOfCompany?.id);
+      formData.append("industry", businessType?.id);
+      formData.append("description", productDescription);
+      
+      if (user?.roles?.[0]?.name === "Admin") {
+        formData.append("name", fullName);
+        formData.append("email", emailAddress);
+        formData.append("country", countryId);
+        formData.append("phone", phoneNumber);
+        formData.append("password", password);
+        formData.append("confirmPassword", password);
+      }
+      
+      formData.append("business_name", businessName);
+      formData.append("address", address);
+      formData.append("web_address", webAddress);
+      
       try {
         const response = await ApiRequest({
-          url: "/submit_merchant",
-          formdata: form_data,
+          url: user?.roles?.[0]?.name === "Admin" 
+            ? "/submit_merchant" 
+            : "/self/merchant_apply",
+          formdata: formData,
         });
-        if (response?.status == 201) {
-          toast.success("Merchant Registered Success");
+        
+        if (response?.status === 201) {
+          toast.success("Store Apply Success");
           setOpen(false);
 
-          // Reset form fields to empty strings
-          setIdentityOfCompany("");
-          setBusinessType("");
+          // Reset form fields
+          setIdentityOfCompany(null);
+          setBusinessType(null);
           setProductDescription("");
           setFullName("");
           setEmailAddress("");
@@ -224,18 +267,18 @@ export function DrawerDialogDemo({ open, setOpen }) {
           setBusinessName("");
           setAddress("");
           setWebAddress("");
-          // Optionally, reset errors state
           setErrors({});
-        }
-        if (response.status == 400) {
+        } else if (response?.status === 400) {
           toast.error(response?.message);
         }
       } catch (error) {
-        toast.error(error?.response?.message);
+        toast.error(error?.response?.message || "An error occurred");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
   };
+
   // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -249,34 +292,38 @@ export function DrawerDialogDemo({ open, setOpen }) {
     };
   }, []);
 
-    useEffect(() => {
-      const handleClickOutside = (event) => {
-        const clickTargets = [
-          { id: "companyType", setter: setShowIdentityOfCompany },
-          { id: "industry", setter: setShowBusinessType },
-        ];
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const clickTargets = [
+        { id: "companyType", setter: setShowIdentityOfCompany },
+        { id: "industry", setter: setShowBusinessType },
+      ];
+
+      clickTargets.forEach(({ id, setter }) => {
+        if (!event.target.closest(`#${id}`)) {
+          setter(false);
+        }
+      });
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  const isAdmin = user?.roles?.[0]?.name === "Admin";
   
-        clickTargets.forEach(({ id, setter }) => {
-          if (!event.target.closest(`#${id}`)) {
-            setter(false);
-          }
-        });
-      };
-  
-      document.addEventListener("click", handleClickOutside);
-  
-      return () => {
-        document.removeEventListener("click", handleClickOutside);
-      };
-    }, []);
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full h-full bg-black/40">
-      <div className="relative w-full max-w-3xl max-h-full  bg-white rounded-lg text-black">
+      <div className="relative w-full max-w-3xl max-h-full bg-white rounded-lg text-black">
         <ModalHeader title="Become Merchant" action={() => setOpen(false)} />
         <div className="p-6 space-y-5">
-          <StepIndicator step={step} />
+          <StepIndicator step={step} user={user} />
+          
           {step === 1 && (
-            <div className={"grid items-start gap-4 w-full"}>
+            <div className="grid items-start gap-4 w-full">
               <div className="grid gap-1">
                 <SelectDrpodownManu
                   showDeopDownManu={showIdentityOfCompany}
@@ -289,20 +336,21 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   error={errors.identityOfCompany}
                 >
                   {Array.isArray(company) &&
-                    company?.map((item) => (
+                    company.map((item) => (
                       <div
-                        key={item?.id}
+                        key={item.id}
                         onClick={() => {
                           setIdentityOfCompany(item);
                           setShowIdentityOfCompany(false);
                         }}
                         className="p-3 py-1 hover:text-white hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] cursor-pointer"
                       >
-                        <h2>{item?.company_name}</h2>
+                        <h2>{item.company_name}</h2>
                       </div>
                     ))}
                 </SelectDrpodownManu>
               </div>
+              
               <div className="grid gap-1">
                 <SelectDrpodownManu
                   showDeopDownManu={showBusinessType}
@@ -315,20 +363,21 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   error={errors.businessType}
                 >
                   {Array.isArray(industry) &&
-                    industry?.map((item) => (
+                    industry.map((item) => (
                       <div
-                        key={item?.id}
+                        key={item.id}
                         onClick={() => {
                           setBusinessType(item);
                           setShowBusinessType(false);
                         }}
                         className="p-3 py-1 hover:text-white hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] cursor-pointer"
                       >
-                        <h2>{item?.industry_name}</h2>
+                        <h2>{item.industry_name}</h2>
                       </div>
                     ))}
                 </SelectDrpodownManu>
               </div>
+              
               <div className="grid gap-1">
                 <InputField
                   label="Product description"
@@ -338,6 +387,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   type="textarea"
                 />
               </div>
+              
               <Button
                 onclickFunction={handleNext}
                 cssClass="bg-gradient-to-r from-[#2F65EC] to-[#7073F3]"
@@ -345,8 +395,9 @@ export function DrawerDialogDemo({ open, setOpen }) {
               />
             </div>
           )}
-          {step === 2 && (
-            <div className={"grid items-start gap-4"}>
+          
+          {isAdmin && step === 2 && (
+            <div className="grid items-start gap-4">
               <div className="grid gap-1">
                 <InputField
                   label="Legal Name of Person"
@@ -358,6 +409,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   type="text"
                 />
               </div>
+              
               <div className="grid gap-1">
                 <InputField
                   label="Email"
@@ -398,7 +450,10 @@ export function DrawerDialogDemo({ open, setOpen }) {
                       <div className="absolute top-3 right-2">
                         <FaTimes
                           className="w-5 h-5 rounded-full cursor-pointer text-lg text-white bg-[#2F65EC] p-1"
-                          onClick={() => setSearchTerm("")}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSearchTerm("");
+                          }}
                         />
                       </div>
                     ) : (
@@ -411,6 +466,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                       </div>
                     )}
                   </div>
+                  
                   {showCountryList && (
                     <div
                       id="country-list"
@@ -420,7 +476,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                         type="text"
                         id="country"
                         placeholder="Search countries..."
-                        className="w-full border-b bg-gray-50 px-3 py-2 outline-none transition duration-100 "
+                        className="w-full border-b bg-gray-50 px-3 py-2 outline-none transition duration-100"
                         onChange={(e) => {
                           setSearchTerm(e.target.value);
                           setShowCountryList(true);
@@ -428,35 +484,32 @@ export function DrawerDialogDemo({ open, setOpen }) {
                         name="random-country"
                         autoComplete="random-country"
                       />
-                      {Array.isArray(filteredCountries) &&
-                      filteredCountries?.length > 0 ? (
-                        filteredCountries?.map((country, index) => (
+                      {filteredCountries?.length > 0 ? (
+                        filteredCountries.map((country, index) => (
                           <div
                             key={index}
                             className="px-2 py-2 lg:py-2 lg:px-3 text-black text-sm cursor-pointer hover:bg-gradient-to-r from-blue-500 to-purple-600 hover:text-white w-full flex items-center justify-between"
                             onClick={() => handleCountryClick(country)}
                           >
-                            {country?.name}
-                            <span>{country?.phone_code}</span>
+                            {country.name}
+                            <span>{country.phone_code}</span>
                           </div>
                         ))
                       ) : (
-                        <div className="p-3 text-sm">
-                          No countries available
-                        </div>
+                        <div className="p-3 text-sm">No countries available</div>
                       )}
                     </div>
                   )}
                 </div>
-                {errors.searchTerm && (
-                  <p className="text-red-500">{errors.searchTerm}</p>
+                {errors.countryId && (
+                  <p className="text-red-500">{errors.countryId}</p>
                 )}
               </div>
 
               <div>
                 <label
                   htmlFor="phone"
-                  className="mb-2 inline-block text-sm  sm:text-base"
+                  className="mb-2 inline-block text-sm sm:text-base"
                 >
                   Phone No <span className="text-red-500">*</span>
                 </label>
@@ -475,7 +528,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                     {phoneCode}
                   </span>
                   <input
-                    className="w-full p-2  bg-transparent rounded-r-md outline-none"
+                    className="w-full p-2 bg-transparent rounded-r-md outline-none"
                     type="text"
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     value={phoneNumber}
@@ -487,7 +540,10 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   {phoneNumber && (
                     <span
                       className="absolute top-2.5 right-2 transform -translate-y-1/2 text-gray-500"
-                      onClick={() => setPhoneNumber("")}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPhoneNumber("");
+                      }}
                     >
                       <FaTimes className="w-5 h-5 rounded-full cursor-pointer text-white bg-[#2F65EC] p-1" />
                     </span>
@@ -497,6 +553,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   <p className="text-red-500">{errors.phoneNumber}</p>
                 )}
               </div>
+              
               <div className="grid gap-1">
                 <InputField
                   label="Password"
@@ -505,11 +562,12 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   onChange={setPassword}
                   required={true}
                   error={errors.password}
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   showPassword={showPassword}
                   setShowPassword={setShowPassword}
                 />
               </div>
+              
               <div className="flex gap-4">
                 <Button
                   onclickFunction={handlePrevious}
@@ -524,8 +582,9 @@ export function DrawerDialogDemo({ open, setOpen }) {
               </div>
             </div>
           )}
-          {step === 3 && (
-            <div className={"grid items-start gap-4"}>
+          
+          {(isAdmin ? step === 3 : step === 2) && (
+            <div className="grid items-start gap-4">
               <div className="grid gap-1">
                 <InputField
                   label="Business Name"
@@ -536,6 +595,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   error={errors.businessName}
                 />
               </div>
+              
               <div className="grid gap-1">
                 <InputField
                   label="Address"
@@ -546,6 +606,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   error={errors.address}
                 />
               </div>
+              
               <div className="grid gap-1">
                 <InputField
                   label="Web Address"
@@ -556,6 +617,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
                   error={errors.webAddress}
                 />
               </div>
+              
               <div className="grid gap-1 grid-cols-1 md:grid-cols-2">
                 <Button
                   cssClass="bg-gray-500"
