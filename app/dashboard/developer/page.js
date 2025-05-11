@@ -15,7 +15,8 @@ export default function DeveloperPage() {
         setIsOn={setIsOn}
         isOn={isOn}
       ></HeaderDeveloper>
-      {isOn ? <Test /> : <Production />}
+      {/* {isOn ? <Test /> : <Production />} */}
+      <Production />
     </div>
   );
 }

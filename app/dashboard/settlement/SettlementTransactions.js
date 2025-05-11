@@ -7,17 +7,27 @@ import { toast } from "react-toastify";
 import InputFiledLabel from "../(dashboard_Component)/InputFiledLabel";
 import FilterStatus from "../(dashboard_Component)/FilterStatus";
 
-function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWithdrw, mainBalance }) {
+function WithdrawTransactions({
+  showModal,
+  setShowModal,
+  getMainBalance,
+  getWithdrw,
+  mainBalance,
+}) {
   const [paymentMethod, setPaymentMethod] = useState([]);
+  const [storesUser, setStoresUser] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showTransitionMethod, setShowTransitionMethod] = useState(false);
   const [transitionMethod, setTransitionMethod] = useState(null);
   const [showCurrency, setShowCurrency] = useState(false);
   const [currency, setCurrency] = useState(null);
-  const [deposit_Address, setDeposit_Address] = useState('');
-  const [amount, setAmount] = useState('');
+  const [deposit_Address, setDeposit_Address] = useState("");
+  const [amount, setAmount] = useState("");
   const [errors, setErrors] = useState({});
   const token = Cookies.get("auth_token_font");
+
+  const [showStores, setShowStores] = useState(false);
+  const [store, setStore] = useState(null);
 
   useEffect(() => {
     if (showModal && currency) {
@@ -43,6 +53,13 @@ function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWith
       getPayment();
     }
   }, [showModal, currency]);
+
+  useEffect(() => {
+    const storeUser = JSON.parse(localStorage.getItem("storesUser"));
+    if (storeUser) {
+      setStoresUser(storeUser);
+    }
+  }, []);
 
   const validateForm = () => {
     let valid = true;
@@ -82,6 +99,7 @@ function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWith
     formdata.append("method", transitionMethod?.network);
     formdata.append("account", deposit_Address);
     formdata.append("amount", amount);
+    formdata.append("api_id", store?.api_id);
 
     try {
       const response = await axios.post(
@@ -97,10 +115,11 @@ function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWith
         toast.success("Withdraw Request Success");
         getMainBalance();
         getWithdrw();
-        setCurrency('');
+        setCurrency("");
         setTransitionMethod(null);
-        setDeposit_Address('');
-        setAmount('');
+        setDeposit_Address("");
+        setAmount("");
+        setStore(null);
       } else {
         toast.error(response?.data?.message);
       }
@@ -116,6 +135,7 @@ function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWith
       const clickTargets = [
         { id: "setShowTransitionMethod", setter: setShowTransitionMethod },
         { id: "setShowCurrency", setter: setShowCurrency },
+        { id: "setShowStores", setter: setShowStores },
       ];
 
       clickTargets.forEach(({ id, setter }) => {
@@ -135,7 +155,13 @@ function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWith
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl max-w-2xl w-full">
         <div className="flex justify-between items-center p-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold">Settlement Request : <span className="text-green-500"> {mainBalance?.toLocaleString("en-US")}</span></h3>
+          <h3 className="text-lg font-semibold">
+            Settlement Request :{" "}
+            <span className="text-green-500">
+              {" "}
+              {mainBalance?.toLocaleString("en-US")}
+            </span>
+          </h3>
           <button
             className="cursor-pointer w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white hover:bg-red-600"
             onClick={() => setShowModal(!showModal)}
@@ -170,26 +196,30 @@ function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWith
             error={errors.currency}
             cssClass="w-full"
           >
-            {
-              ["BDT", "USD"]?.map((item, index) => (
-                <div
-                  key={index}
-                  className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
-                  onClick={() => {
-                    setCurrency(item)
-                    setShowCurrency(false)
-                  }}
-                >
-                  <span> {item}</span>
-                </div>
-              ))}
+            {["BDT", "USD"]?.map((item, index) => (
+              <div
+                key={index}
+                className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                onClick={() => {
+                  setCurrency(item);
+                  setShowCurrency(false);
+                }}
+              >
+                <span> {item}</span>
+              </div>
+            ))}
           </FilterStatus>
 
           <FilterStatus
             showMerchantStatus={showTransitionMethod}
             setShowMerchantStatus={setShowTransitionMethod}
             setSearchMerchantStatus={setTransitionMethod}
-            searchMerchantStatus={transitionMethod?.network ? transitionMethod?.network?.charAt(0).toUpperCase() + transitionMethod?.network?.slice(1).toLowerCase():""}
+            searchMerchantStatus={
+              transitionMethod?.network
+                ? transitionMethod?.network?.charAt(0).toUpperCase() +
+                  transitionMethod?.network?.slice(1).toLowerCase()
+                : ""
+            }
             id="setShowTransitionMethod"
             placeholderText="Payment Method..."
             label="Payment Method"
@@ -203,13 +233,39 @@ function WithdrawTransactions({ showModal, setShowModal, getMainBalance, getWith
                   key={index}
                   className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
                   onClick={() => {
-                    setTransitionMethod(item)
-                    setShowTransitionMethod(false)
+                    setTransitionMethod(item);
+                    setShowTransitionMethod(false);
                   }}
                 >
                   <span> {item?.network}</span>
                 </div>
               ))}
+          </FilterStatus>
+
+          <FilterStatus
+            showMerchantStatus={showStores}
+            setShowMerchantStatus={setShowStores}
+            setSearchMerchantStatus={setStore}
+            searchMerchantStatus={store?.business_name ? store?.business_name?.charAt(0).toUpperCase() + store?.business_name?.slice(1).toLowerCase() : ""}
+            id="setShowStores"
+            placeholderText="All Stores..."
+            label="All Stores"
+            required={true}
+            error={errors.store}
+            cssClass="w-full"
+          >
+            {storesUser?.map((item, index) => (
+              <div
+                key={index}
+                className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                onClick={() => {
+                  setStore(item);
+                  setShowStores(false);
+                }}
+              >
+                <span> {item?.business_name?.charAt(0).toUpperCase() + item?.business_name?.slice(1).toLowerCase()}</span>
+              </div>
+            ))}
           </FilterStatus>
           <InputFiledLabel
             value={deposit_Address}

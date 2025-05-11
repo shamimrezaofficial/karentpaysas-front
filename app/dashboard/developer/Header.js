@@ -12,16 +12,16 @@ function HeaderDeveloper({ isOn, setIsOn}) {
 
       <div className="  px-2 lg:px-0  ">
         <div className="flex justify-between items-center gap-3">
-          {isOn ? (
+          {/* {isOn ? (
             <h3 className="text-2xl font-bold ml-2 lg:ml-8">Test</h3>
           ) : (
-            <h3 className="text-2xl font-bold ml-2 lg:ml-8">Developer</h3>
-          )}
+          )} */}
+          <h3 className="text-2xl font-bold ml-2 lg:ml-8">Developer</h3>
           <div
-            className={`w-60 h-12  flex items-center justify-around   rounded-md cursor-pointer bg-[#111857]`}
+            className={`w-fit h-12  flex items-center justify-around  px-2 rounded-md cursor-pointer bg-[#111857]`}
             onClick={() => toggleSwitch()}
           >
-            <p
+            {/* <p
               className={`${isOn
                 ? "bg-gradient-2"
                 : "bg-[#111857]"
@@ -29,14 +29,14 @@ function HeaderDeveloper({ isOn, setIsOn}) {
               onClick={() => toggleSwitch}
             >
               Test mode
-            </p>
+            </p> */}
 
             <p
-              className={`${!isOn
+              className={`${true
                 ? "bg-gradient-2"
                 : "bg-[#111857]"
                 } w-24 h-10 rounded-md text-center flex items-center justify-center text-sm text-white font-bold`}
-              onClick={() => toggleSwitch}
+              // onClick={() => toggleSwitch}
             >
               Dev mode
             </p>

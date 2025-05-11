@@ -16,7 +16,7 @@ function FilterStatus({
   return (
     <div className={`w-full ${label ? "md:w-full" : "md:w-[200px]"}`}>
       {label && (
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor={id} className="mb-2 inline-block text-sm sm:text-base cursor-pointer text-[#09090B]">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
       )}

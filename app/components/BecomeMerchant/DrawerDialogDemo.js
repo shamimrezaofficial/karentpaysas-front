@@ -318,7 +318,7 @@ export function DrawerDialogDemo({ open, setOpen }) {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full h-full bg-black/40">
       <div className="relative w-full max-w-3xl max-h-full bg-white rounded-lg text-black">
-        <ModalHeader title="Become Merchant" action={() => setOpen(false)} />
+        <ModalHeader title={isAdmin ? "New User Create" : "New Store Create"} action={() => setOpen(false)} />
         <div className="p-6 space-y-5">
           <StepIndicator step={step} user={user} />
           

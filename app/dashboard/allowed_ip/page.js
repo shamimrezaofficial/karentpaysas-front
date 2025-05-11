@@ -5,11 +5,12 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { MdDelete } from "react-icons/md";
-import InputFiledLabel from "../../(dashboard_Component)/InputFiledLabel";
+import InputFiledLabel from "../(dashboard_Component)/InputFiledLabel";
 import { FaSpinner } from "react-icons/fa6";
-import TableFooter from "../../(dashboard_Component)/TableFooter";
-import Table from "../../(dashboard_Component)/Table";
-import SkeletonLoader from "../../(dashboard_Component)/SkeletonLoader";
+import TableFooter from "../(dashboard_Component)/TableFooter";
+import Table from "../(dashboard_Component)/Table";
+import SkeletonLoader from "../(dashboard_Component)/SkeletonLoader";
+import FilterStatus from "../(dashboard_Component)/FilterStatus";
 
 function AllowedIpPage() {
   const headers = ["Sl", "Date", "Ip Address", "Status", "Action"];
@@ -21,6 +22,16 @@ function AllowedIpPage() {
   const token = Cookies.get("auth_token_font");
   const [addLoading, setAddLoading] = useState(false);
   const [data, setData] = useState([]);
+  const [storesUser, setStoresUser] = useState([]);
+  const [showStores, setShowStores] = useState(false);
+  const [store, setStore] = useState(null);
+
+  useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("storesUser"));
+    if (store) {
+      setStoresUser(store);
+    }
+  }, []);
 
   useEffect(() => {
     setLoading(true);
@@ -122,7 +133,7 @@ function AllowedIpPage() {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
-    <>
+    <section className="bg-white shadow-md border border-gray-200 rounded">
       <div className="p-5">
         <button
           onClick={() => setAddAllowedIp(!addAllowedIp)}
@@ -135,23 +146,23 @@ function AllowedIpPage() {
       <Table headers={headers}>
         {loading
           ? Array.from({ length: 10 }).map((_, index) => (
-                <tr key={index} className="table_tr">
-                  {[
-                    { width: "w-8", height: "h-4" },
-                    { width: "w-32", height: "h-14" },
-                    { width: "w-20", height: "h-6" },
-                    { width: "w-28", height: "h-14" },
-                    { width: "w-14", height: "h-8" },
-                  ].map((item, i) => (
-                    <SkeletonLoader item={item} i={i} />
-                  ))}
-                </tr>
-              ))
+              <tr key={index} className="table_tr">
+                {[
+                  { width: "w-8", height: "h-4" },
+                  { width: "w-32", height: "h-14" },
+                  { width: "w-20", height: "h-6" },
+                  { width: "w-28", height: "h-14" },
+                  { width: "w-14", height: "h-8" },
+                ].map((item, i) => (
+                  <SkeletonLoader item={item} key={i} />
+                ))}
+              </tr>
+            ))
           : Array.isArray(visibleTransactions) &&
             visibleTransactions?.map((item, index) => (
               <tr key={index} className="table_tr">
                 <td className="px-6 py-4 whitespace-nowrap">
-                {totalItems - ((currentPage - 1) * itemsPerPage + index)}
+                  {totalItems - ((currentPage - 1) * itemsPerPage + index)}
                 </td>
                 <td className="px-4 py-4 ">
                   <h2 className="flex items-center">
@@ -205,7 +216,40 @@ function AllowedIpPage() {
         <div className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center w-full h-full bg-black/40">
           <div className="relative w-full max-w-xl max-h-full  ">
             <div className="relative p-10 bg-white rounded-[4px] shadow">
-              <div className="space-y-5 text-black text-size">
+              <div className="space-y-4 text-black text-size">
+                <FilterStatus
+                  showMerchantStatus={showStores}
+                  setShowMerchantStatus={setShowStores}
+                  setSearchMerchantStatus={setStore}
+                  searchMerchantStatus={
+                    store?.business_name
+                      ? store?.business_name?.charAt(0).toUpperCase() +
+                        store?.business_name?.slice(1).toLowerCase()
+                      : ""
+                  }
+                  id="setShowStores"
+                  placeholderText="All Stores..."
+                  label="All Stores"
+                  required={true}
+                  cssClass="w-full"
+                >
+                  {storesUser?.map((item, index) => (
+                    <div
+                      key={index}
+                      className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                      onClick={() => {
+                        setStore(item);
+                        setShowStores(false);
+                      }}
+                    >
+                      <span>
+                        {" "}
+                        {item?.business_name?.charAt(0).toUpperCase() +
+                          item?.business_name?.slice(1).toLowerCase()}
+                      </span>
+                    </div>
+                  ))}
+                </FilterStatus>
                 <InputFiledLabel
                   value={allowedIp}
                   onChange={setAllowedIp}
@@ -266,7 +310,7 @@ function AllowedIpPage() {
                     {deleteItem ? "Loading..." : "Submit"}
                   </button>
                   <button
-                    onClick={() => setDeleteAllowedIp(null)}                    
+                    onClick={() => setDeleteAllowedIp(null)}
                     className=" py-2 px-4 bg-red-500 text-white hover:bg-red-600 cursor-pointer rounded w-fit shadow-sm"
                   >
                     Close
@@ -277,7 +321,7 @@ function AllowedIpPage() {
           </div>
         </div>
       )}
-    </>
+    </section>
   );
 }
 export default AllowedIpPage;

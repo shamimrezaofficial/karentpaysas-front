@@ -57,12 +57,24 @@ function Transactions() {
   const todayDate = moment(today);
   const differenceInDays = todayDate.diff(startDates, "days");
 
+  const [storesUser, setStoresUser] = useState(null);
+  const [storeLoading, setStoreLoading] = useState(true);
+  
+  useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (store) {
+      setStoresUser(store);
+    }
+    setStoreLoading(false);
+  }, [])
+  
   const fetchData = async () => {
     const token = await GetCookies({ name: "auth_token_font" });
+    if (storeLoading) return;
     if (token) {
       try {
         const response = await ApiRequest({
-          url: `cash_in_history?start_date=${
+          url: `cash_in_history${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}?start_date=${
             differenceInDays > 0 ? startDate : ""
           }&end_date=${
             differenceInDays > 0 ? endDate : ""
@@ -84,7 +96,7 @@ function Transactions() {
   useEffect(() => {
     setLoading(true);
     fetchData();
-  }, [currentPage]);
+  }, [currentPage,storesUser]);
 
   useEffect(() => {
     setCurrentPage(1);

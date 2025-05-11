@@ -24,21 +24,20 @@ export async function middleware(req) {
       return res;
     }
   }
-
   const protectedPaths = [
     { href: "/dashboard", roles: ["Merchant", "Admin"] },
-    { href: "/dashboard/cash-in", roles: ["Merchant"] },
-    { href: "/dashboard/payout", roles: ["Merchant"] },
-    { href: "/dashboard/settlement", roles: ["Merchant"] },
-    { href: "/dashboard/payments", roles: ["Merchant"] },
-    { href: "/dashboard/statement", roles: ["Admin"] },
+    { href: "/dashboard/cash-in", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/payout", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/settlement", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/payments", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/statement", roles: ["Merchant","Admin"] },
     { href: "/dashboard/developer", roles: ["Merchant", "Admin"] },
-    { href: "/dashboard/support", roles: ["Merchant"] },
-    { href: "/dashboard/reports", roles: ["Merchant"] },
+    { href: "/dashboard/support", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/reports", roles: ["Merchant","Admin"] },
     // { href: "/dashboard/own-merchant-apply", roles: ["Admin"] },
-    { href: "/dashboard/settings", roles: ["Merchant", "Admin"] },
-    { href: "/dashboard/settings/payment", roles: ["Admin"] },
-    { href: "/dashboard/settings/allowed-ip", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/profile", roles: ["Merchant", "Admin"] },
+    { href: "/dashboard/payment_page", roles: ["Merchant", "Admin"] },
+    { href: "/dashboard/allowed_ip", roles: ["Merchant", "Admin"] },
   ];
 
   const hasRole = (roleNames = []) =>
@@ -61,7 +60,10 @@ export async function middleware(req) {
   }
 
   // যদি ইউজার আগে থেকেই লগইন করা থাকে এবং login বা register পেজে ঢুকতে চায়
-  if ((url.pathname === "/auth/login" || url.pathname === "/auth/register") && authToken) {
+  if (
+    (url.pathname === "/auth/login" || url.pathname === "/auth/register") &&
+    authToken
+  ) {
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
   }

@@ -49,13 +49,24 @@ function Payout() {
   const today = moment(date).format("YYYY-MM-DD");
   const startDates = moment(startDate);
   const todayDate = moment(today);
-  const differenceInDays = todayDate.diff(startDates, "days");
+  const differenceInDays = todayDate.diff(startDates, "days");  
+  const [storesUser, setStoresUser] = useState(null);
+  const [storeLoading, setStoreLoading] = useState(true);
+
+  useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (store) {
+      setStoresUser(store);
+    }
+    setStoreLoading(false);
+  }, [])
 
   const fetchData = async () => {
     const token = await GetCookies({ name: "auth_token_font" });
+    setLoading(true);
     if (token) {
       const response = await ApiRequest({
-        url: `/transactions?page=${currentPage}&per_page=${ItemsPerPage}&start_date=${
+        url: `transactions${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}?page=${currentPage}&per_page=${ItemsPerPage}&start_date=${
           differenceInDays > 0 ? startDate : ""
         }&end_date=${
           differenceInDays > 0 ? endDate : ""
@@ -78,7 +89,7 @@ function Payout() {
   useEffect(() => {
     setLoading(true);
     fetchData();
-  }, [currentPage]);
+  }, [currentPage,storesUser]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -267,7 +278,7 @@ function Payout() {
                     { width: "w-28", height: "h-14" },
                     { width: "w-14", height: "h-8" },
                   ].map((item, i) => (
-                    <SkeletonLoader item={item} i={i} />
+                    <SkeletonLoader item={item} key={i} />
                   ))}
                 </tr>
               ))

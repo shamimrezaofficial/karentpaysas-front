@@ -12,20 +12,29 @@ import {
   MdTrendingDown,
 } from "react-icons/md";
 import ApiRequest from "../lib/Api_request";
-import useUserData from "../lib/useUserData";
 function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [allbalance, setAllbalance] = useState(null);
-  const { user } = useUserData();
+  const [storesUser, setStoresUser] = useState(null);
+  const [storeLoading, setStoreLoading] = useState(true);
+
+  useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (store) {
+      setStoresUser(store);
+    }
+    setStoreLoading(false);
+  }, [])
 
   useEffect(() => {
     getallBalance();
-  }, []);
+  }, [storesUser]);
 
   const getallBalance = async () => {
+    if (storeLoading) return;
     setLoading(true);
     const response = await ApiRequest({
-      url: "/marchent_balance",
+      url: `/marchent_balance${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}`,
       method: "get",
     });
     if (response?.status == 200) {
@@ -168,23 +177,13 @@ function DashboardPage() {
       icon: MdAttachMoney,
     },
   ];
+  console.log(storesUser)
   return (
     <section className="text-white shadow-md rounded border border-gray-200">
       <div className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-6 gap-5">
-          {user?.roles?.some((role) => role.name === "Admin")
-            ? adminBalanceItems?.map((item, index) => (
-                <DashboardCard
-                  key={index}
-                  title={item.title}
-                  amount={item.transaction}
-                  color={item.color}
-                  gridSize={item.gridSize}
-                  loading={loading}
-                  icon={item.icon}
-                />
-              ))
-            : merchantBalanceItems?.map((item, index) => (
+          {storesUser?.api_id
+            ? merchantBalanceItems?.map((item, index) => (
                 <DashboardCard
                   key={index}
                   title={item.title}
@@ -194,6 +193,17 @@ function DashboardPage() {
                   loading={loading}
                   icon={item.icon}
                   link={item.link}
+                />
+              ))
+            : adminBalanceItems?.map((item, index) => (
+                <DashboardCard
+                  key={index}
+                  title={item.title}
+                  amount={item.transaction}
+                  color={item.color}
+                  gridSize={item.gridSize}
+                  loading={loading}
+                  icon={item.icon}
                 />
               ))}
         </div>

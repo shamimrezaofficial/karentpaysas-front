@@ -50,6 +50,14 @@ function page() {
   const [showTransactionCategories, setShowTransactionCategories] =
     useState(false);
   const [transactionCategory, setTransactionCategory] = useState("");
+  const [storesUser, setStoresUser] = useState(null);
+
+  /* useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (store) {
+      setStoresUser(store);
+    }
+  }, []) */
 
   useEffect(() => {
     setLoading(true);

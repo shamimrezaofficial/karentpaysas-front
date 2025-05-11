@@ -11,17 +11,19 @@ import {
   MdAccountBalance,
   MdBalance,
 } from "react-icons/md";
-import { FaMoneyCheckAlt, FaHandsHelping } from "react-icons/fa";
+import { FaMoneyCheckAlt, FaHandsHelping, FaUserCog } from "react-icons/fa";
 import { HiDocumentReport } from "react-icons/hi";
 import { IoSettings } from "react-icons/io5";
 import { MdDeveloperMode } from "react-icons/md";
 import useFetchingData from "@/app/lib/useFetchingData";
 import useUserData from "@/app/lib/useUserData";
-import { RiUserSettingsLine } from "react-icons/ri";
+import { TbWorldDown } from "react-icons/tb";
+import { RiSecurePaymentFill } from "react-icons/ri";
 
 function DashboardSideBer() {
   const [scrollDirection, setScrollDirection] = useState("up");
   const token = Cookies.get("auth_token_font");
+  const [storesUser, setStoresUser] = useState(null);
 
   const { user } = useUserData();
   const pathname = usePathname();
@@ -59,6 +61,13 @@ function DashboardSideBer() {
   }, [fetchData]);
 
   useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (store) {
+      setStoresUser(store);
+    }
+  }, []);
+
+  useEffect(() => {
     let lastScrollY = window.scrollY;
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -76,7 +85,7 @@ function DashboardSideBer() {
   const hasRole = (roleNames = []) =>
     user?.roles?.some((role) => roleNames.includes(role.name));
 
-  const menuItems = [
+  /*  const menuItems = [
     {
       href: "/dashboard",
       icon: <MdSpaceDashboard className="mr-2 text-2xl" />,
@@ -87,31 +96,31 @@ function DashboardSideBer() {
       href: "/dashboard/cash-in",
       icon: <MdAccountBalanceWallet className="mr-2 text-2xl" />,
       label: "Deposit",
-      roles: ["Merchant"],
+      roles: [storesUser?.api_id ? "Merchant" || "Admin" : ""],
     },
     {
       href: "/dashboard/payout",
       icon: <FaMoneyCheckAlt className="mr-2 text-2xl" />,
       label: "Payout",
-      roles: ["Merchant"],
+      roles: [storesUser?.api_id ? "Merchant" || "Admin" : ""],
     },
     {
       href: "/dashboard/settlement",
       icon: <MdBalance className="mr-2 text-2xl" />,
       label: "Settlement",
-      roles: ["Merchant"],
+      roles: ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/payments",
       icon: <MdPayments className="mr-2 text-2xl" />,
       label: "Payments",
-      roles: ["Merchant"],
+      roles: [storesUser?.api_id ? "Merchant" || "Admin" : ""],
     },
     {
       href: "/dashboard/statement",
       icon: <MdAccountBalance className="mr-2 text-2xl" />,
       label: "Statement Balance",
-      roles: ["Admin"],
+      roles: storesUser?.api_id ? '' : ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/developer",
@@ -123,32 +132,105 @@ function DashboardSideBer() {
       href: "/dashboard/support",
       icon: <FaHandsHelping className="mr-2 text-2xl" />,
       label: "Support",
-      roles: ["Merchant"],
+      roles: ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/reports",
       icon: <HiDocumentReport className="mr-2 text-2xl" />,
       label: "Reports",
-      roles: ["Merchant"],
+      roles: ["Merchant", "Admin"],
     },
-    /* {
-      href: "/dashboard/own-merchant-apply",
-      icon: <RiUserSettingsLine className="mr-2 text-2xl" />,
-      label: "Own Merchant Apply",
-      roles: ["Admin"],
-    }, */
     {
       href: "/dashboard/settings",
       icon: <IoSettings className="mr-2 text-2xl" />,
       label: "Settings",
       roles: ["Merchant", "Admin"],
     },
+    {
+      href: "/dashboard/allowed_ip",
+      icon: <RiUserSettingsLine className="mr-2 text-2xl" />,
+      label: "Allowed IP",
+      roles: [storesUser?.api_id ? "" : "Merchant", "Admin"],
+    },
+  ]; */
+
+  const menuItems = [
+    {
+      href: "/dashboard",
+      icon: <MdSpaceDashboard className="mr-2 text-2xl" />,
+      label: "Dashboard",
+      roles: ["Merchant", "Admin"],
+    },
+    {
+      href: "/dashboard/cash-in",
+      icon: <MdAccountBalanceWallet className="mr-2 text-2xl" />,
+      label: "Deposit",
+      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
+    },
+    {
+      href: "/dashboard/payout",
+      icon: <FaMoneyCheckAlt className="mr-2 text-2xl" />,
+      label: "Payout",
+      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
+    },
+    {
+      href: "/dashboard/settlement",
+      icon: <MdBalance className="mr-2 text-2xl" />,
+      label: "Settlement",
+      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
+    },
+    {
+      href: "/dashboard/payments",
+      icon: <MdPayments className="mr-2 text-2xl" />,
+      label: "Payments",
+      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
+    },
+    {
+      href: "/dashboard/statement",
+      icon: <MdAccountBalance className="mr-2 text-2xl" />,
+      label: "Statement Balance",
+      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
+    },
+    {
+      href: "/dashboard/developer",
+      icon: <MdDeveloperMode className="mr-2 text-2xl" />,
+      label: "Developer",
+      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
+    },
+    {
+      href: "/dashboard/support",
+      icon: <FaHandsHelping className="mr-2 text-2xl" />,
+      label: "Support",
+      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
+    },
+    {
+      href: "/dashboard/reports",
+      icon: <HiDocumentReport className="mr-2 text-2xl" />,
+      label: "Reports",
+      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
+    },
+    {
+      href: "/dashboard/profile",
+      icon: <FaUserCog className="mr-2 text-2xl" />,
+      label: "Profile",
+      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
+    },
+    {
+      href: "/dashboard/allowed_ip",
+      icon: <TbWorldDown className="mr-2 text-2xl" />,
+      label: "Allowed IP",
+      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
+    },
+    {
+      href: "/dashboard/payment_page",
+      icon: <RiSecurePaymentFill className="mr-2 text-2xl" />,
+      label: "Payment Page",
+      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
+    },
   ];
 
-  const visibleMenu = menuItems.filter(
-    (item) => hasRole(item.roles)
-  );
-  
+  const visibleMenu = menuItems.filter((item) => hasRole(item.roles));
+
   return (
     <div
       className={`hidden lg:block lg:w-[300px] mr-5 mt-10 rounded-md ${

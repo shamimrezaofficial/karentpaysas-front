@@ -45,15 +45,23 @@ function Wtransactions() {
   const [total, setTotal] = useState({ totalItems: 0, totalPage: 0 });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [storesUser, setStoresUser] = useState(null);
+
+  useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (store) {
+      setStoresUser(store);
+    }
+  }, [])
 
   useEffect(() => {
     setlooding(true);
     getWithdrw();
-  }, [currentPage]);
+  }, [currentPage,storesUser]);
 
   const getWithdrw = async () => {
     const response = await ApiRequest({
-      url: `/withdraw_history?page=${currentPage}&per_page=${itemsPerPage}&search=${search}&end_date=${
+      url: `withdraw_history${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}?page=${currentPage}&per_page=${itemsPerPage}&search=${search}&end_date=${
         differenceInDays > 0 ? endDate : ""
       }&start_date=${differenceInDays > 0 ? startDate : ""}`,
       method: "get",
