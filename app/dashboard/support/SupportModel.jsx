@@ -1,11 +1,12 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { toast } from "react-toastify";
 import InputFiledLabel from "../(dashboard_Component)/InputFiledLabel";
+import FilterStatus from "../(dashboard_Component)/FilterStatus";
 
 function SupportModel({ isModalOpen, setIsModalOpen, user, setRender }) {
   const [subject, setSubject] = useState("");
@@ -16,6 +17,15 @@ function SupportModel({ isModalOpen, setIsModalOpen, user, setRender }) {
     subject: "",
     message: "",
   });
+  const [storesUser, setStoresUser] = useState([]);
+  const [showStores, setShowStores] = useState(false);
+  const [store, setStore] = useState(null);
+  useEffect(() => {
+    const storeUser = JSON.parse(localStorage.getItem("storesUser"));
+    if (storeUser) {
+      setStoresUser(storeUser);
+    }
+  }, []);
 
   const handleImageChange = async (event) => {
     setLoading(true);
@@ -59,6 +69,7 @@ function SupportModel({ isModalOpen, setIsModalOpen, user, setRender }) {
     const newErrors = {};
     if (!subject?.trim()) newErrors.subject = "Subject is required";
     if (!message?.trim()) newErrors.message = "Message is required";
+    if (!store?.api_id) newErrors.store = "Store is required";
 
     if (Object.keys(newErrors)?.length > 0) {
       setErrors(newErrors);
@@ -74,6 +85,7 @@ function SupportModel({ isModalOpen, setIsModalOpen, user, setRender }) {
 
     formData.append("subject", subject);
     formData.append("message", message);
+    formData.append("api_id", store?.api_id);
     if (uploadImages) {
       formData.append("image", JSON.stringify(uploadImages));
     }
@@ -103,6 +115,25 @@ function SupportModel({ isModalOpen, setIsModalOpen, user, setRender }) {
         setLoading(false);
       });
   };
+  
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const clickTargets = [
+        { id: "setShowStores", setter: setShowStores },
+      ];
+      clickTargets.forEach(({ id, setter }) => {
+        if (!event.target.closest(`#${id}`)) {
+          setter(false);
+        }
+      });
+    };
+
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   return (
     <div>
       {isModalOpen && (
@@ -119,7 +150,40 @@ function SupportModel({ isModalOpen, setIsModalOpen, user, setRender }) {
                     <IoClose />
                   </button>
                 </div>
-
+                <FilterStatus
+                  showMerchantStatus={showStores}
+                  setShowMerchantStatus={setShowStores}
+                  setSearchMerchantStatus={setStore}
+                  searchMerchantStatus={
+                    store?.business_name
+                      ? store?.business_name?.charAt(0).toUpperCase() +
+                        store?.business_name?.slice(1).toLowerCase()
+                      : ""
+                  }
+                  id="setShowStores"
+                  placeholderText="All Stores..."
+                  label="All Stores"
+                  required={true}
+                  error={errors.store}
+                  cssClass="w-full"
+                >
+                  {storesUser?.map((item, index) => (
+                    <div
+                      key={index}
+                      className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                      onClick={() => {
+                        setStore(item);
+                        setShowStores(false);
+                      }}
+                    >
+                      <span>
+                        {" "}
+                        {item?.business_name?.charAt(0).toUpperCase() +
+                          item?.business_name?.slice(1).toLowerCase()}
+                      </span>
+                    </div>
+                  ))}
+                </FilterStatus>
                 <InputFiledLabel
                   value={subject}
                   onChange={setSubject}

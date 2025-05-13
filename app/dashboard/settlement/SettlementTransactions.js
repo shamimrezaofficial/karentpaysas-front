@@ -64,7 +64,10 @@ function WithdrawTransactions({
   const validateForm = () => {
     let valid = true;
     let newErrors = {};
-
+    if (!store) {
+      valid = false;
+      newErrors.store = "Store is required.";
+    }
     if (!currency?.trim()) {
       valid = false;
       newErrors.currency = "Currency is required.";
@@ -151,6 +154,8 @@ function WithdrawTransactions({
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  console.log(store)
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl max-w-2xl w-full">
@@ -159,7 +164,7 @@ function WithdrawTransactions({
             Settlement Request :{" "}
             <span className="text-green-500">
               {" "}
-              {mainBalance?.toLocaleString("en-US")}
+              {store?.balance || mainBalance?.toLocaleString("en-US")}
             </span>
           </h3>
           <button
@@ -184,6 +189,40 @@ function WithdrawTransactions({
         </div>
 
         <div className="p-6 space-y-4 w-full">
+          <FilterStatus
+            showMerchantStatus={showStores}
+            setShowMerchantStatus={setShowStores}
+            setSearchMerchantStatus={setStore}
+            searchMerchantStatus={
+              store?.business_name
+                ? store?.business_name?.charAt(0).toUpperCase() +
+                  store?.business_name?.slice(1).toLowerCase()
+                : ""
+            }
+            id="setShowStores"
+            placeholderText="All Stores..."
+            label="All Stores"
+            required={true}
+            error={errors.store}
+            cssClass="w-full"
+          >
+            {storesUser?.map((item, index) => (
+              <div
+                key={index}
+                className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                onClick={() => {
+                  setStore(item);
+                  setShowStores(false);
+                }}
+              >
+                <span>
+                  {" "}
+                  {item?.business_name?.charAt(0).toUpperCase() +
+                    item?.business_name?.slice(1).toLowerCase()}
+                </span>
+              </div>
+            ))}
+          </FilterStatus>
           <FilterStatus
             showMerchantStatus={showCurrency}
             setShowMerchantStatus={setShowCurrency}
@@ -240,32 +279,6 @@ function WithdrawTransactions({
                   <span> {item?.network}</span>
                 </div>
               ))}
-          </FilterStatus>
-
-          <FilterStatus
-            showMerchantStatus={showStores}
-            setShowMerchantStatus={setShowStores}
-            setSearchMerchantStatus={setStore}
-            searchMerchantStatus={store?.business_name ? store?.business_name?.charAt(0).toUpperCase() + store?.business_name?.slice(1).toLowerCase() : ""}
-            id="setShowStores"
-            placeholderText="All Stores..."
-            label="All Stores"
-            required={true}
-            error={errors.store}
-            cssClass="w-full"
-          >
-            {storesUser?.map((item, index) => (
-              <div
-                key={index}
-                className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
-                onClick={() => {
-                  setStore(item);
-                  setShowStores(false);
-                }}
-              >
-                <span> {item?.business_name?.charAt(0).toUpperCase() + item?.business_name?.slice(1).toLowerCase()}</span>
-              </div>
-            ))}
           </FilterStatus>
           <InputFiledLabel
             value={deposit_Address}

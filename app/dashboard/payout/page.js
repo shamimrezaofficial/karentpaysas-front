@@ -62,6 +62,7 @@ function Payout() {
   }, [])
 
   const fetchData = async () => {
+    if (storeLoading) return;
     const token = await GetCookies({ name: "auth_token_font" });
     setLoading(true);
     if (token) {

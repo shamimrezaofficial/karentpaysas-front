@@ -177,7 +177,6 @@ function DashboardPage() {
       icon: MdAttachMoney,
     },
   ];
-  console.log(storesUser)
   return (
     <section className="text-white shadow-md rounded border border-gray-200">
       <div className="p-6">

@@ -294,7 +294,7 @@ function Transactions() {
                     { width: "w-20", height: "h-4", extra: 1 },
                     { width: "w-14", height: "h-8" },
                   ].map((item, i) => (
-                    <SkeletonLoader item={item} i={i} key={i} />
+                    <SkeletonLoader item={item} key={i}/>
                   ))}
                 </tr>
               ))

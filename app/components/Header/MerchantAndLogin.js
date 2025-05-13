@@ -88,6 +88,8 @@ function MerchantAndLogin({ user, authToken, adminUrl }) {
     getAllStore();
   }, [user]);
 
+  console.log(storesUser)
+
   return (
     <div className="min-w-[100px]">
       {authToken && user && (
@@ -100,19 +102,7 @@ function MerchantAndLogin({ user, authToken, adminUrl }) {
               className="relative inline-flex cursor-pointer items-center justify-center p-0.5 overflow-hidden text-sm font-medium text-gray-900 rounded group bg-gradient-to-br from-purple-600 to-blue-500 hover:from-purple-500 hover:to-blue-400 hover:text-white focus:ring-4 focus:outline-none focus:ring-blue-300"
             >
               <span className="relative px-5 py-2 transition-all ease-in duration-75 bg-white rounded group-hover:bg-transparent group-hover:text-white flex items-center gap-1">
-                {/*{stores ? "":user?.avatar == null || user?.avatar == undefined ? (
-                  ""
-                ) : (
-                  <Image
-                    src={user?.avatar}
-                    width={100}
-                    height={100}
-                    alt="avatar"
-                    className="rounded-full w-6 h-6"
-                    loading="lazy"
-                  />
-                )}
-                {stores ? stores?.business_name?.charAt(0).toUpperCase() + stores?.business_name?.slice(1).toLowerCase() : user && user?.name?.charAt(0).toUpperCase() + user?.name?.slice(1).toLowerCase()}*/}
+               
                 {storeLoading ? (
                   <>
                     <div className="rounded-full w-6 h-6 bg-gray-300 animate-pulse"></div>

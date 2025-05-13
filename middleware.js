@@ -5,6 +5,7 @@ export async function middleware(req) {
   const authToken = req.cookies.get("auth_token_font")?.value;
   const url = req.nextUrl.clone();
   let user = null;
+  let storesUser = null;
 
   if (authToken) {
     try {
@@ -24,22 +25,36 @@ export async function middleware(req) {
       return res;
     }
   }
+  if (authToken && user?.id) {
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/get_webaddress/${user?.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      storesUser = response?.data?.data[0];
+    } catch (error) {
+      console.error("Error fetching store user info:", error);
+    }
+  }
   const protectedPaths = [
     { href: "/dashboard", roles: ["Merchant", "Admin"] },
-    { href: "/dashboard/cash-in", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/cash-in", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/payout", roles: ["Merchant","Admin"] },
     { href: "/dashboard/settlement", roles: ["Merchant","Admin"] },
     { href: "/dashboard/payments", roles: ["Merchant","Admin"] },
     { href: "/dashboard/statement", roles: ["Merchant","Admin"] },
     { href: "/dashboard/developer", roles: ["Merchant", "Admin"] },
-    { href: "/dashboard/support", roles: ["Merchant","Admin"] },
+    { href: "/dashboard/support", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/reports", roles: ["Merchant","Admin"] },
     // { href: "/dashboard/own-merchant-apply", roles: ["Admin"] },
     { href: "/dashboard/profile", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/payment_page", roles: ["Merchant", "Admin"] },
     { href: "/dashboard/allowed_ip", roles: ["Merchant", "Admin"] },
   ];
-
   const hasRole = (roleNames = []) =>
     user?.roles?.some((role) => roleNames.includes(role.name));
 

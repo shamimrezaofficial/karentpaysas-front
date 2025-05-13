@@ -35,6 +35,16 @@ function PaymentCopy() {
   const [showQrCode, setShowQrCode] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [storesUser, setStoresUser] = useState(null);
+  const [storeLoading, setStoreLoading] = useState(true);
+
+  useEffect(() => {
+    const store = JSON.parse(localStorage.getItem("store"));
+    if (store) {
+      setStoresUser(store);
+    }
+    setStoreLoading(false);
+  }, []);
   // Add useEffect to handle screen resize
   useEffect(() => {
     const handleResize = () => {
@@ -54,9 +64,10 @@ function PaymentCopy() {
   }, []);
 
   const getPayLink = async () => {
+    if (storeLoading) return;
     setLoading(true);
     const response = await ApiRequest({
-      url: "/v1/pay_with_link",
+      url: `/v1/pay_with_link${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}`,
       method: "get",
     });
     if (response?.status === 200) {
@@ -72,6 +83,7 @@ function PaymentCopy() {
   const getNewLink = async () => {
     const response = await ApiRequest({
       url: "/v1/pay_with_link",
+      formdata: { api_id: storesUser?.api_id },
     });
     if (response?.status === 200) {
       getPayLink();
@@ -149,7 +161,6 @@ function PaymentCopy() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-
   return (
     <section className="bg-white shadow-md border border-gray-200 rounded">
       <div className="space-y-5">
@@ -170,7 +181,7 @@ function PaymentCopy() {
                       { width: "w-10", height: "h-14" },
                       { width: "w-10", height: "h-6" },
                     ].map((item, i) => (
-                      <SkeletonLoader item={item} i={i} />
+                      <SkeletonLoader item={item} key={i} />
                     ))}
                   </tr>
                 ))
@@ -284,103 +295,6 @@ function PaymentCopy() {
                     </div>
                   </td>
 
-                  {showQrCode ===
-                    process.env.NEXT_PUBLIC_BASE_URL + "/pay/" + item?.link && (
-                    <div
-                      id="popup-modal"
-                      className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black/30 px-2 overflow-y-auto"
-                    >
-                      <div className="relative w-full max-w-2xl my-8 sm:my-14">
-                        <div
-                          className="bg-white relative rounded-lg shadow max-h-[90vh] overflow-y-auto"
-                          ref={modalRef}
-                        >
-                          <button
-                            onClick={() => setShowQrCode("")}
-                            type="button"
-                            className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-2xl z-10"
-                          >
-                            <IoMdClose />
-                          </button>
-
-                          <div className="p-6 sm:p-12">
-                            <div className="flex gap-4 flex-col sm:flex-row items-center justify-center">
-                              <div className="w-[150px] md:w-[200px]">
-                                <Image
-                                  width={500}
-                                  height={500}
-                                  src={
-                                    payment?.company_logo
-                                      ? payment?.company_logo
-                                      : "https://shop.raceya.fit/wp-content/uploads/2020/11/logo-placeholder.jpg"
-                                  }
-                                  alt="website logo"
-                                  className="rounded w-full"
-                                  loading="lazy"
-                                />
-                              </div>
-                              <div className="w-full sm:w-[70%] space-y-2 flex flex-col items-center sm:items-start text-center sm:text-left">
-                                <h3 className="text-2xl md:text-4xl font-bold text-black tracking-widest break-words">
-                                  {payment?.payment_title || "Gateway Name"}
-                                </h3>
-                                {payment?.mobile_number && (
-                                  <div className="flex items-center gap-2 text-lg">
-                                    <FaPhoneVolume className="text-blue-600 text-2xl" />
-                                    <p>{payment?.mobile_number}</p>
-                                  </div>
-                                )}
-                                {payment?.address && (
-                                  <div className="flex items-center gap-2 text-lg">
-                                    <FaLocationDot className="text-blue-600 text-2xl" />
-                                    <p className="break-words">
-                                      {payment?.address}
-                                    </p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-
-                            <div className="w-full flex flex-col items-center justify-center py-10">
-                              <div className="w-[250px] h-[250px]">
-                                <QRCodeSVG
-                                  value={showQrCode}
-                                  size={250}
-                                  level="H"
-                                  includeMargin={true}
-                                  imageSettings={{
-                                    src: logo?.settings?.faviconImage || "",
-                                    height: 40,
-                                    width: 40,
-                                    excavate: true,
-                                  }}
-                                  style={{ backgroundColor: "#f0f0f0" }}
-                                />
-                              </div>
-                              <h2 className="mt-5 text-2xl md:text-3xl text-center">
-                                Scan and pay with Link
-                              </h2>
-                            </div>
-
-                            <div className="flex items-center justify-center">
-                              <Link
-                                href={showQrCode}
-                                target="_blank"
-                                prefetch={false}
-                                className="text-white font-medium rounded-[4px] px-4 py-2 w-full mx-auto flex items-center justify-center gap-1"
-                                style={{
-                                  background:
-                                    "linear-gradient(to right, #2D64EC, #BA83FC)",
-                                }}
-                              >
-                                Pay Now
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
                   <td className="p-4 hidden sm:table-cell">
                     <div className="flex items-center gap-2">
                       <button
@@ -396,6 +310,99 @@ function PaymentCopy() {
                   </td>
                 </tr>
               ))}
+          {showQrCode && (
+            <div
+              id="popup-modal"
+              className="fixed inset-0 z-50 flex justify-center items-center w-full h-full bg-black/30 px-2 overflow-y-auto"
+            >
+              <div className="relative w-full max-w-2xl my-8 sm:my-14">
+                <div
+                  className="bg-white relative rounded-lg shadow max-h-[90vh] overflow-y-auto"
+                  ref={modalRef}
+                >
+                  <button
+                    onClick={() => setShowQrCode("")}
+                    type="button"
+                    className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1 rounded-full text-2xl z-10"
+                  >
+                    <IoMdClose />
+                  </button>
+
+                  <div className="p-6 sm:p-12">
+                    <div className="flex gap-4 flex-col sm:flex-row items-center justify-center">
+                      <div className="w-[150px] md:w-[200px]">
+                        <Image
+                          width={500}
+                          height={500}
+                          src={
+                            payment?.company_logo
+                              ? payment?.company_logo
+                              : "https://shop.raceya.fit/wp-content/uploads/2020/11/logo-placeholder.jpg"
+                          }
+                          alt="website logo"
+                          className="rounded w-full"
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="w-full sm:w-[70%] space-y-2 flex flex-col items-center sm:items-start text-center sm:text-left">
+                        <h3 className="text-2xl md:text-4xl font-bold text-black tracking-widest break-words">
+                          {payment?.payment_title || "Gateway Name"}
+                        </h3>
+                        {payment?.mobile_number && (
+                          <div className="flex items-center gap-2 text-lg">
+                            <FaPhoneVolume className="text-blue-600 text-2xl" />
+                            <p>{payment?.mobile_number}</p>
+                          </div>
+                        )}
+                        {payment?.address && (
+                          <div className="flex items-center gap-2 text-lg">
+                            <FaLocationDot className="text-blue-600 text-2xl" />
+                            <p className="break-words">{payment?.address}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="w-full flex flex-col items-center justify-center py-10">
+                      <div className="w-[250px] h-[250px]">
+                        <QRCodeSVG
+                          value={showQrCode}
+                          size={250}
+                          level="H"
+                          includeMargin={true}
+                          imageSettings={{
+                            src: logo?.settings?.faviconImage || "",
+                            height: 40,
+                            width: 40,
+                            excavate: true,
+                          }}
+                          style={{ backgroundColor: "#f0f0f0" }}
+                        />
+                      </div>
+                      <h2 className="mt-5 text-2xl md:text-3xl text-center">
+                        Scan and pay with Link
+                      </h2>
+                    </div>
+
+                    <div className="flex items-center justify-center">
+                      <Link
+                        href={showQrCode}
+                        target="_blank"
+                        prefetch={false}
+                        className="text-white font-medium rounded-[4px] px-4 py-2 w-full mx-auto flex items-center justify-center gap-1"
+                        style={{
+                          background:
+                            "linear-gradient(to right, #2D64EC, #BA83FC)",
+                        }}
+                      >
+                        Pay Now
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           {deleteModalOpen && (
             <div
               id="popup-modal"

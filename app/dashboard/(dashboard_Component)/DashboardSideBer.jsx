@@ -20,7 +20,7 @@ import useUserData from "@/app/lib/useUserData";
 import { TbWorldDown } from "react-icons/tb";
 import { RiSecurePaymentFill } from "react-icons/ri";
 
-function DashboardSideBer() {
+function DashboardSideBer({setPathname}) {
   const [scrollDirection, setScrollDirection] = useState("up");
   const token = Cookies.get("auth_token_font");
   const [storesUser, setStoresUser] = useState(null);
@@ -84,76 +84,6 @@ function DashboardSideBer() {
 
   const hasRole = (roleNames = []) =>
     user?.roles?.some((role) => roleNames.includes(role.name));
-
-  /*  const menuItems = [
-    {
-      href: "/dashboard",
-      icon: <MdSpaceDashboard className="mr-2 text-2xl" />,
-      label: "Dashboard",
-      roles: ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/cash-in",
-      icon: <MdAccountBalanceWallet className="mr-2 text-2xl" />,
-      label: "Deposit",
-      roles: [storesUser?.api_id ? "Merchant" || "Admin" : ""],
-    },
-    {
-      href: "/dashboard/payout",
-      icon: <FaMoneyCheckAlt className="mr-2 text-2xl" />,
-      label: "Payout",
-      roles: [storesUser?.api_id ? "Merchant" || "Admin" : ""],
-    },
-    {
-      href: "/dashboard/settlement",
-      icon: <MdBalance className="mr-2 text-2xl" />,
-      label: "Settlement",
-      roles: ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/payments",
-      icon: <MdPayments className="mr-2 text-2xl" />,
-      label: "Payments",
-      roles: [storesUser?.api_id ? "Merchant" || "Admin" : ""],
-    },
-    {
-      href: "/dashboard/statement",
-      icon: <MdAccountBalance className="mr-2 text-2xl" />,
-      label: "Statement Balance",
-      roles: storesUser?.api_id ? '' : ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/developer",
-      icon: <MdDeveloperMode className="mr-2 text-2xl" />,
-      label: "Developer",
-      roles: ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/support",
-      icon: <FaHandsHelping className="mr-2 text-2xl" />,
-      label: "Support",
-      roles: ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/reports",
-      icon: <HiDocumentReport className="mr-2 text-2xl" />,
-      label: "Reports",
-      roles: ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/settings",
-      icon: <IoSettings className="mr-2 text-2xl" />,
-      label: "Settings",
-      roles: ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/allowed_ip",
-      icon: <RiUserSettingsLine className="mr-2 text-2xl" />,
-      label: "Allowed IP",
-      roles: [storesUser?.api_id ? "" : "Merchant", "Admin"],
-    },
-  ]; */
-
   const menuItems = [
     {
       href: "/dashboard",
@@ -230,7 +160,12 @@ function DashboardSideBer() {
   ];
 
   const visibleMenu = menuItems.filter((item) => hasRole(item.roles));
-
+  useEffect(() => {
+    const checkPathname = visibleMenu.find((item) => item.href === pathname);
+    if (!checkPathname) {
+      redirect("/dashboard");
+    }
+  }, [pathname]);
   return (
     <div
       className={`hidden lg:block lg:w-[300px] mr-5 mt-10 rounded-md ${

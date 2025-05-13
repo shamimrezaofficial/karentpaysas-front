@@ -51,28 +51,32 @@ function page() {
     useState(false);
   const [transactionCategory, setTransactionCategory] = useState("");
   const [storesUser, setStoresUser] = useState(null);
-
-  /* useEffect(() => {
+  const [storeLoading, setStoreLoading] = useState(true);
+  
+  useEffect(() => {
     const store = JSON.parse(localStorage.getItem("store"));
     if (store) {
       setStoresUser(store);
     }
-  }, []) */
+    setStoreLoading(false);
+  }, [])
 
   useEffect(() => {
+    
     setLoading(true);
     getBalanceHistory();
-  }, [currentPage]);
+  }, [currentPage,storesUser]);
 
   useEffect(() => {
     setCurrentPage(1);
     getBalanceHistory();
   }, [search, startEndDate, transactionCategory, transactionType]);
-
+  
   const getBalanceHistory = async () => {
+    if (storeLoading) return;
     try {
       const response = await ApiRequest({
-        url: `/merchant/transaction-history?page=${currentPage}&per_page=${itemsPerPage}&search=${search}&end_date=${
+        url: `/merchant/transaction-history${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}?page=${currentPage}&per_page=${itemsPerPage}&search=${search}&end_date=${
           differenceInDays > 0 ? endDate : ""
         }&start_date=${
           differenceInDays > 0 ? startDate : ""
@@ -98,6 +102,7 @@ function page() {
     getTransactionTypes();
     getTransactionCategories();
   }, []);
+
   const getTransactionTypes = async () => {
     try {
       const response = await ApiRequest({
@@ -289,7 +294,7 @@ function page() {
                       { width: "w-16", height: "h-8" },
                       { width: "w-16", height: "h-8" },
                     ].map((item, i) => (
-                      <SkeletonLoader item={item} i={i} />
+                      <SkeletonLoader item={item} key={i} />
                     ))}
                   </tr>
                 ))

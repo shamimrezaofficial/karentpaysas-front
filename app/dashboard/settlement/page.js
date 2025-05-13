@@ -10,6 +10,7 @@ import DatePickers from "../(dashboard_Component)/DatePickers";
 import InputFiled from "../(dashboard_Component)/InputFiled";
 import ApiRequest from "@/app/lib/Api_request";
 import SkeletonLoader from "../(dashboard_Component)/SkeletonLoader";
+import FilterStatus from "../(dashboard_Component)/FilterStatus";
 
 function Wtransactions() {
   const headers = [
@@ -45,23 +46,27 @@ function Wtransactions() {
   const [total, setTotal] = useState({ totalItems: 0, totalPage: 0 });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [storesUser, setStoresUser] = useState(null);
+  const [allStore, setAllStore] = useState([]);
+  const [showStores, setShowStores] = useState(false);
+  const [store, setStore] = useState(null);
 
   useEffect(() => {
-    const store = JSON.parse(localStorage.getItem("store"));
-    if (store) {
-      setStoresUser(store);
+    const storeUser = JSON.parse(localStorage.getItem("storesUser"));
+    if ( storeUser) {
+      setAllStore(storeUser);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     setlooding(true);
     getWithdrw();
-  }, [currentPage,storesUser]);
+  }, [currentPage]);
 
   const getWithdrw = async () => {
     const response = await ApiRequest({
-      url: `withdraw_history${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}?page=${currentPage}&per_page=${itemsPerPage}&search=${search}&end_date=${
+      url: `withdraw_history${
+        store?.api_id ? `/${store?.api_id}` : ""
+      }?page=${currentPage}&per_page=${itemsPerPage}&search=${search}&end_date=${
         differenceInDays > 0 ? endDate : ""
       }&start_date=${differenceInDays > 0 ? startDate : ""}`,
       method: "get",
@@ -78,11 +83,9 @@ function Wtransactions() {
     }
   };
   useEffect(() => {
-    if (search || startEndDate?.startDate || startEndDate?.endDate) {
-    }
     setCurrentPage(1);
     getWithdrw();
-  }, [search, startEndDate]);
+  }, [search, startEndDate, store]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
 
@@ -100,6 +103,23 @@ function Wtransactions() {
   useEffect(() => {
     getMainBalance();
   }, []);
+
+  useEffect(() => {
+    const handleClick = (event) => {
+      const clickTargets = [{ id: "setShowStores", setter: setShowStores }];
+      clickTargets.forEach(({ id, setter }) => {
+        if (!event.target.closest(`#${id}`)) {
+          setter(false);
+        }
+      });
+    };
+    window.document.addEventListener("click", handleClick);
+
+    return () => {
+      window.document.removeEventListener("click", handleClick);
+    };
+  }, []);
+
   return (
     <section className="bg-white shadow-md border border-gray-200 rounded-md ml-0  ">
       <div className="space-y-6">
@@ -112,6 +132,42 @@ function Wtransactions() {
                 placeholder="Search Number, Method, Currency"
               />
             </div>
+
+            <FilterStatus
+              showMerchantStatus={showStores}
+              setShowMerchantStatus={setShowStores}
+              setSearchMerchantStatus={setStore}
+              searchMerchantStatus={
+                store?.business_name
+                  ? store.business_name.length > 15
+                    ? store.business_name.charAt(0).toUpperCase() +
+                      store.business_name.slice(1, 15).toLowerCase() +
+                      "..."
+                    : store.business_name.charAt(0).toUpperCase() +
+                      store.business_name.slice(1).toLowerCase()
+                  : ""
+              }
+              id="setShowStores"
+              placeholderText="All Stores..."
+              cssClass="w-full"
+            >
+              {allStore?.map((item, index) => (
+                <div
+                  key={index}
+                  className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                  onClick={() => {
+                    setStore(item);
+                    setShowStores(false);
+                  }}
+                >
+                  <span>
+                    {" "}
+                    {item?.business_name?.charAt(0).toUpperCase() +
+                      item?.business_name?.slice(1).toLowerCase()}
+                  </span>
+                </div>
+              ))}
+            </FilterStatus>
             <ButtonDashboard
               open={showModal}
               onClick={setShowModal}
@@ -148,7 +204,7 @@ function Wtransactions() {
                       { width: "w-28", height: "h-14" },
                       { width: "w-14", height: "h-8" },
                     ].map((item, i) => (
-                      <SkeletonLoader item={item} i={i} />
+                      <SkeletonLoader item={item} key={i} />
                     ))}
                   </tr>
                 ))

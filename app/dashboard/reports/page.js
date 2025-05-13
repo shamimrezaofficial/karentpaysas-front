@@ -67,19 +67,30 @@ function page() {
     totalItems: 0,
     totalPage: 0,
   });
+  const [storesUser, setStoresUser] = useState([]);
+  const [showStores, setShowStores] = useState(false);
+  const [store, setStore] = useState(null);
+
+  useEffect(() => {
+    const storeUser = JSON.parse(localStorage.getItem("storesUser"));
+    if (storeUser) {
+      setStoresUser(storeUser);
+    }
+  }, []);
 
   useEffect(() => {
     if (reportsFilter === "") return;
     setLoading(true);
     fetchData();
   }, [currentPage, reportsFilter]);
+
   const fetchData = async () => {
     try {
       let endpoint = "";
       if (["Manual", "P2C", "P2P"].includes(reportsFilter)) {
-        endpoint = "/api/merchant/report/history/cash-in";
+        endpoint = `/api/merchant/report/history/cash-in`;
       } else if (reportsFilter === "Pay Out") {
-        endpoint = "/api/merchant/report/filter/payouts";
+        endpoint = `/api/merchant/report/filter/payouts`;
       }
 
       const params = new URLSearchParams({
@@ -88,6 +99,7 @@ function page() {
         payment_method: reportsFilterMethod,
         start_date: differenceInDays > 0 ? startDate : "",
         end_date: differenceInDays > 0 ? endDate : "",
+        api_id: store?.api_id ? `${store?.api_id}` : "",
       });
 
       if (reportsFilter === "P2P") {
@@ -122,7 +134,7 @@ function page() {
   useEffect(() => {
     setCurrentPage(1);
     fetchData();
-  }, [reportsFilterMethod, startEndDate]);
+  }, [reportsFilterMethod, startEndDate, store]);
 
   const handleExportReport = async () => {
     if (!reportsFilter) return toast.error("Please select payment type.");
@@ -133,8 +145,12 @@ function page() {
         reportsFilter === "P2C" ||
         reportsFilter === "P2P" ||
         reportsFilter === "Manual"
-          ? "/api/merchant/report/export/cash-in"
-          : "/api/merchant/report/export/payout"
+          ? `/api/merchant/report/export/cash-in?api_id=${
+              store?.api_id ? `${store?.api_id}` : ""
+            }`
+          : `/api/merchant/report/export/payout?api_id=${
+              store?.api_id ? `${store?.api_id}` : ""
+            }`
       }?payment_method=${
         reportsFilter === "P2P" ? "" : reportsFilterMethod
       }&start_date=${differenceInDays > 0 ? startDate : ""}&end_date=${
@@ -175,22 +191,25 @@ function page() {
   };
 
   useEffect(() => {
-    const handleClickOutsideOperator = (event) => {
-      if (!event.target.closest("#setReportsFilterShow")) {
-        setReportsFilterShow(false);
-      }
+    const handleClick = (event) => {
+      const clickTargets = [
+        { id: "setReportsFilterShow", setter: setReportsFilterShow },
+        {
+          id: "setReportsFilterShowMethod",
+          setter: setReportsFilterShowMethod,
+        },
+        { id: "setShowStores", setter: setShowStores },
+      ];
+      clickTargets.forEach(({ id, setter }) => {
+        if (!event.target.closest(`#${id}`)) {
+          setter(false);
+        }
+      });
     };
-    const handleClickMethod = (event) => {
-      if (!event.target.closest("#setReportsFilterShowMethod")) {
-        setReportsFilterShowMethod(false);
-      }
-    };
-    window.document.addEventListener("click", handleClickOutsideOperator);
-    window.document.addEventListener("click", handleClickMethod);
+    window.document.addEventListener("click", handleClick);
 
     return () => {
-      window.document.removeEventListener("click", handleClickOutsideOperator);
-      window.document.removeEventListener("click", handleClickMethod);
+      window.document.removeEventListener("click", handleClick);
     };
   }, []);
 
@@ -283,7 +302,10 @@ function page() {
               showMerchantStatus={reportsFilterShowMethod}
               setShowMerchantStatus={setReportsFilterShowMethod}
               setSearchMerchantStatus={setReportsFilterMethod}
-              searchMerchantStatus={reportsFilterMethod?.charAt(0).toUpperCase() + reportsFilterMethod?.slice(1).toLowerCase()}
+              searchMerchantStatus={
+                reportsFilterMethod?.charAt(0).toUpperCase() +
+                reportsFilterMethod?.slice(1).toLowerCase()
+              }
               id="setReportsFilterShowMethod"
               placeholderText="Payment Method..."
             >
@@ -306,6 +328,41 @@ function page() {
                   <span> No Data Available</span>
                 </div>
               )}
+            </FilterStatus>
+            <FilterStatus
+              showMerchantStatus={showStores}
+              setShowMerchantStatus={setShowStores}
+              setSearchMerchantStatus={setStore}
+              searchMerchantStatus={
+                store?.business_name
+                  ? store.business_name.length > 15
+                    ? store.business_name.charAt(0).toUpperCase() +
+                      store.business_name.slice(1, 15).toLowerCase() +
+                      "..."
+                    : store.business_name.charAt(0).toUpperCase() +
+                      store.business_name.slice(1).toLowerCase()
+                  : ""
+              }
+              id="setShowStores"
+              placeholderText="All Stores..."
+              cssClass="w-full"
+            >
+              {storesUser?.map((item, index) => (
+                <div
+                  key={index}
+                  className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
+                  onClick={() => {
+                    setStore(item);
+                    setShowStores(false);
+                  }}
+                >
+                  <span>
+                    {" "}
+                    {item?.business_name?.charAt(0).toUpperCase() +
+                      item?.business_name?.slice(1).toLowerCase()}
+                  </span>
+                </div>
+              ))}
             </FilterStatus>
           </div>
           <DatePickers
@@ -412,7 +469,7 @@ function page() {
                     { width: "w-20", height: "h-4", extra: 1 },
                     { width: "w-14", height: "h-8" },
                   ].map((item, i) => (
-                    <SkeletonLoader item={item} i={i} key={i} />
+                    <SkeletonLoader item={item} key={i} />
                   ))}
                 </tr>
               ))
@@ -462,8 +519,8 @@ function page() {
                         {transaction?.payment_method_type === "auto"
                           ? "P2C"
                           : ["p2p", "p2c"].includes(
-                          transaction?.payment_method_type.toLowerCase()
-                        )
+                              transaction?.payment_method_type.toLowerCase()
+                            )
                           ? transaction?.payment_method_type.toUpperCase()
                           : transaction?.payment_method_type
                               .charAt(0)

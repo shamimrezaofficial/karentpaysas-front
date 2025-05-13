@@ -13,7 +13,7 @@ import SkeletonLoader from "../(dashboard_Component)/SkeletonLoader";
 import FilterStatus from "../(dashboard_Component)/FilterStatus";
 
 function AllowedIpPage() {
-  const headers = ["Sl", "Date", "Ip Address", "Status", "Action"];
+  const headers = ["Sl", "Date", "Business Name", "Ip Address", "Status", "Action"];
   const [addAllowedIp, setAddAllowedIp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingAdd, setLoadingAdd] = useState(false);
@@ -69,6 +69,7 @@ function AllowedIpPage() {
     setAddLoading(true);
     const formData = new FormData();
     formData.append("ip_address", allowedIp);
+    formData.append("api_id", store?.api_id);
 
     try {
       setLoadingAdd(true);
@@ -150,6 +151,7 @@ function AllowedIpPage() {
                 {[
                   { width: "w-8", height: "h-4" },
                   { width: "w-32", height: "h-14" },
+                  { width: "w-32", height: "h-14" },
                   { width: "w-20", height: "h-6" },
                   { width: "w-28", height: "h-14" },
                   { width: "w-14", height: "h-8" },
@@ -168,6 +170,9 @@ function AllowedIpPage() {
                   <h2 className="flex items-center">
                     {moment(item?.created_at).format("Do MMM YYYY")}
                   </h2>
+                </td>
+                <td className="px-4 py-4 whitespace-nowrap">
+                  <h2>{item?.api_key?.merchants?.business_name}</h2>
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap">
                   <h2>{item?.ip_address}</h2>
