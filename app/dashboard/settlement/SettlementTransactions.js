@@ -13,6 +13,7 @@ function WithdrawTransactions({
   getMainBalance,
   getWithdrw,
   mainBalance,
+  totalPendingList,
 }) {
   const [paymentMethod, setPaymentMethod] = useState([]);
   const [storesUser, setStoresUser] = useState([]);
@@ -91,11 +92,14 @@ function WithdrawTransactions({
     setErrors(newErrors);
     return valid;
   };
+  const storePendingAmount = totalPendingList?.filter(
+    (transaction) => transaction?.api_key?.id === store?.api_id
+  )?.length;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!validateForm()) return;
+
     setLoading(true);
     const formdata = new FormData();
     formdata.append("currency", currency);
@@ -103,6 +107,7 @@ function WithdrawTransactions({
     formdata.append("account", deposit_Address);
     formdata.append("amount", amount);
     formdata.append("api_id", store?.api_id);
+    formdata.append("store_amount", store?.balance);
 
     try {
       const response = await axios.post(
@@ -154,8 +159,6 @@ function WithdrawTransactions({
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
-
-  console.log(store)
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
       <div className="bg-white rounded-lg overflow-hidden shadow-xl max-w-2xl w-full">
@@ -283,8 +286,8 @@ function WithdrawTransactions({
           <InputFiledLabel
             value={deposit_Address}
             onChange={setDeposit_Address}
-            placeholder="Deposit Address"
-            label="Deposit Address"
+            placeholder="Deposit Name"
+            label="Deposit Name"
             errors={errors.deposit_Address}
             required={true}
             name="account"
@@ -304,9 +307,9 @@ function WithdrawTransactions({
 
           <div className="flex justify-around">
             <button
-              disabled={loading}
+              disabled={loading || storePendingAmount?.length > 0}
               onClick={handleSubmit}
-              className=" bg-gradient-2 text-white w-full py-2 rounded-md flex items-center justify-center cursor-pointer gap-2"
+              className={`bg-gradient-2 text-white w-full py-2 rounded-md flex items-center justify-center ${storePendingAmount?.length > 0 ? "cursor-not-allowed" : "cursor-pointer"} gap-2`}
             >
               {loading ? (
                 <>

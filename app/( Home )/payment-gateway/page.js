@@ -30,7 +30,7 @@ const PaymentGateway = async () => {
                         alt={gateway?.gateway_name}
                         priority
                       />
-                      <h3>{gateway?.gateway_name}</h3>
+                      <h3 className="text-xl font-bold mt-2">{gateway?.gateway_name}</h3>
                     </div>
                   ))}
               </div>

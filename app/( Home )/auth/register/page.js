@@ -9,6 +9,7 @@ import { SetCookies } from "@/app/lib/cookiesSetting";
 import InputField from "@/app/ui/InputField";
 import Cookies from "js-cookie";
 import countries from "@/public/countries.json";
+import { validatePhoneNumber } from "@/app/lib/formatAndValidatePhoneNumber";
 
 export default function Register() {
   const dropdownRef = useRef(null);
@@ -50,7 +51,7 @@ export default function Register() {
       formErrors.name = "Full name is required";
       isValid = false;
     }
-
+/* 
     // Validate phone and phone code
     if (phoneCode === "+00") {
       formErrors.phoneCode = "Phone code is required";
@@ -60,7 +61,7 @@ export default function Register() {
       formErrors.phone = "Phone number is required";
       isValid = false;
     }
-
+ */
     // Validate country (searchTerm and filteredCountries)
     if (!searchTerm?.trim()) {
       formErrors.searchTerm = "Country is required";
@@ -99,6 +100,11 @@ export default function Register() {
   };
 
   const handleSignUp = async () => {
+    const phoneValidation = validatePhoneNumber(phoneCode, phone);
+    if (!phoneValidation.isValid) {
+      setErrors({ phone: phoneValidation.error });
+      return;
+    }
     if (validateForm()) {
       try {
         setLoading(true);
@@ -106,7 +112,7 @@ export default function Register() {
 
         formData.append("name", name);
         formData.append("email", email);
-        formData.append("phone", phoneCode + phone);
+        formData.append("phone", phoneValidation.formattedPhone);
         formData.append("country", countryId);
         formData.append("password", password);
         formData.append("confirmPassword", confirmPassword);

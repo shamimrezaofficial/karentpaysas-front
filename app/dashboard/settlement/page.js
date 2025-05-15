@@ -16,7 +16,8 @@ function Wtransactions() {
   const headers = [
     "Sl",
     "Date",
-    "Merchant Info",
+    // "Merchant Info",
+    "Business Name",
     "Settlement Info",
     "Payment Info",
     "Amount / Fee",
@@ -52,7 +53,7 @@ function Wtransactions() {
 
   useEffect(() => {
     const storeUser = JSON.parse(localStorage.getItem("storesUser"));
-    if ( storeUser) {
+    if (storeUser) {
       setAllStore(storeUser);
     }
   }, []);
@@ -120,6 +121,9 @@ function Wtransactions() {
     };
   }, []);
 
+  const totalPendingList = transactions?.filter(
+    (transaction) => transaction?.status === "Pending"
+  );
   return (
     <section className="bg-white shadow-md border border-gray-200 rounded-md ml-0  ">
       <div className="space-y-6">
@@ -162,8 +166,8 @@ function Wtransactions() {
                 >
                   <span>
                     {" "}
-                    {item?.business_name?.charAt(0).toUpperCase() +
-                      item?.business_name?.slice(1).toLowerCase()}
+                    {item?.business_name?.charAt(0)?.toUpperCase() +
+                      item?.business_name?.slice(1)?.toLowerCase()}
                   </span>
                 </div>
               ))}
@@ -180,6 +184,7 @@ function Wtransactions() {
                 getMainBalance={getMainBalance}
                 getWithdrw={getWithdrw}
                 mainBalance={mainBalance}
+                totalPendingList={totalPendingList}
               />
             )}
           </div>
@@ -197,7 +202,8 @@ function Wtransactions() {
                     {[
                       { width: "w-8", height: "h-4" },
                       { width: "w-20", height: "h-4", extra: 1 },
-                      { width: "w-32", height: "h-14" },
+                      // { width: "w-32", height: "h-14" },
+                      { width: "w-20", height: "h-6" },
                       { width: "w-20", height: "h-6" },
                       { width: "w-20", height: "h-4", extra: 2 },
                       { width: "w-20", height: "h-4", extra: 1 },
@@ -224,7 +230,7 @@ function Wtransactions() {
                       ? moment(transaction?.created_at).format("h:mm a")
                       : "--"}
                   </td>
-                  <td>
+                  {/* <td>
                     {transaction?.users && (
                       <div className="cursor-pointer items-center p-1 border border-gray-200 hover:bg-gray-100 rounded font-semibold w-[170px] break-words">
                         {transaction?.users?.name && (
@@ -234,6 +240,11 @@ function Wtransactions() {
                           <h1>{transaction?.users?.phone}</h1>
                         )}
                       </div>
+                    )}
+                  </td> */}
+                  <td className="p-4">
+                    {transaction?.api_key?.merchants?.business_name && (
+                      <>{transaction?.api_key?.merchants?.business_name}</>
                     )}
                   </td>
                   <td className="p-4">{transaction?.number}</td>

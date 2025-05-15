@@ -88,8 +88,6 @@ function MerchantAndLogin({ user, authToken, adminUrl }) {
     getAllStore();
   }, [user]);
 
-  console.log(storesUser)
-
   return (
     <div className="min-w-[100px]">
       {authToken && user && (

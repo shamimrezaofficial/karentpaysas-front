@@ -114,15 +114,73 @@ function PaymentPage() {
 
   const handleONchange = (e) => {
     const file = e.target.files[0];
+    const fileInput = document.getElementById("icon");
+
     if (file) {
-      // Allow all image formats
-      if (!file.type.startsWith("image/")) {
+      const allowedExtensions = [
+        ".png",
+        ".jpg",
+        ".jpeg",
+        ".gif",
+        ".bmp",
+        ".webp",
+        ".svg",
+      ];
+      const forbiddenPatterns = [
+        /<\?php/i,
+        /<script/i,
+        /<\/script>/i,
+        /<html/i,
+        /<\w+.*>/i,
+      ];
+      const fileName = file.name.toLowerCase();
+
+      // Extension check
+      const hasValidExtension = allowedExtensions.some((ext) =>
+        fileName.endsWith(ext)
+      );
+      if (!hasValidExtension) {
         toast.error("Only image files are allowed!", { autoClose: 3000 });
+        if (fileInput) fileInput.value = "";
+        setCompanyImages(null);
+        setCompanyLogo(null);
         return;
       }
-      setCompanyImages(file);
-      const url = URL.createObjectURL(file);
-      setCompanyLogo(url);
+
+      // MIME type check
+      if (!file.type.startsWith("image/")) {
+        toast.error("Invalid image file type!", { autoClose: 3000 });
+        if (fileInput) fileInput.value = "";
+        setCompanyImages(null);
+        setCompanyLogo(null);
+        return;
+      }
+
+      // File content check
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        const fileContent = event.target.result;
+        const isCodeInjected = forbiddenPatterns.some((pattern) =>
+          pattern.test(fileContent)
+        );
+        if (isCodeInjected) {
+          toast.error("Image file contains suspicious code!", {
+            autoClose: 3000,
+          });
+          if (fileInput) fileInput.value = "";
+          setCompanyImages(null);
+          setCompanyLogo(null);
+          return;
+        }
+
+        // ✅ Passed all checks
+        setCompanyImages(file);
+        const url = URL.createObjectURL(file);
+        setCompanyLogo(url);
+      };
+
+      // Try to read image as text to detect embedded code
+      reader.readAsText(file);
     }
   };
 

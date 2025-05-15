@@ -19,7 +19,15 @@ import SupportView from "./SupportView";
 moment().format();
 
 function Support() {
-  const headers = ["Sl", "Date", "Ticket ID", "Subject", "Status", "Action"];
+  const headers = [
+    "Sl",
+    "Date",
+    "Business Name",
+    "Ticket ID",
+    "Subject",
+    "Status",
+    "Action",
+  ];
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [supportReplyMessage, setSupportReplyMessage] = useState(null);
   const [searchSubjectTicket, setSearchSubjectTicket] = useState("");
@@ -72,7 +80,11 @@ function Support() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/admin/tickets/user?search=${buttonClickSetSearchText}&page=${currentPage}&per_page=${itemsPerPage}&start_date=${differenceInDays > 0 ? startDate : ""}&end_date=${differenceInDays > 0 ? endDate : ""}`,
+          `${
+            process.env.NEXT_PUBLIC_BASE_URL
+          }/api/admin/tickets/user?search=${buttonClickSetSearchText}&page=${currentPage}&per_page=${itemsPerPage}&start_date=${
+            differenceInDays > 0 ? startDate : ""
+          }&end_date=${differenceInDays > 0 ? endDate : ""}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -135,12 +147,12 @@ function Support() {
                   <ButtonDashboard
                     // open={showModal}
                     onClick={handleSearchData}
-                    title='Search'
+                    title="Search"
                   />
                   <ButtonDashboard
                     open={isModalOpen}
                     onClick={setIsModalOpen}
-                    title='Create'
+                    title="Create"
                   />
                 </div>
               </div>
@@ -153,62 +165,69 @@ function Support() {
             <Table headers={headers}>
               {loading
                 ? Array.from({ length: itemsPerPage })?.map((_, index) => (
-                  <tr key={index} className="table_tr">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="h-4 w-6 bg-gray-300 rounded animate-pulse"></div>
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
-                      <div className="h-4 w-24 bg-gray-300 rounded animate-pulse mb-2"></div>
-                      <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
-                      <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
-                    </td>
-                    <td className="p-4 max-w-[200px]">
-                      <div className="h-4 w-36 bg-gray-300 rounded animate-pulse"></div>
-                    </td>
-                    <td className="p-4">
-                      <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <div className="h-10 w-10 bg-gray-300 rounded-full animate-pulse"></div>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-                : Array.isArray(tecket) && tecket?.map((item, index) => (
-                  <tr key={tecket?.length + index} className="table_tr">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {total?.totalItems -
-                        ((currentPage - 1) * itemsPerPage + index)}
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
-                      {item?.created_at
-                        ? moment(item?.created_at).format("DD MMM YYYY")
-                        : ""}
-                      <br />
-                      {item?.created_at
-                        ? moment(item?.created_at).format("hh:mm A")
-                        : ""}
-                    </td>
-                    <td className="p-4 whitespace-nowrap">
-                      {item?.track_id}
-                    </td>
-                    <td className="p-4 max-w-[200px]">{item?.subject}</td>
-                    <td className="p-4 ">{item?.status}</td>
-                    <td className="p-4 ">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setSupportReplyMessage(item)}
-                          className=" text-xl w-fit text-white bg-blue-500 hover:bg-blue-800 rounded-[4px]  p-2 flex items-center gap-1"
-                        >
-                          <FaEye />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                    <tr key={index} className="table_tr">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="h-4 w-6 bg-gray-300 rounded animate-pulse"></div>
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="h-4 w-24 bg-gray-300 rounded animate-pulse mb-2"></div>
+                        <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        <div className="h-4 w-20 bg-gray-300 rounded animate-pulse"></div>
+                      </td>
+                      <td className="p-4 max-w-[200px]">
+                        <div className="h-4 w-36 bg-gray-300 rounded animate-pulse"></div>
+                      </td>
+                      <td className="p-4">
+                        <div className="h-4 w-16 bg-gray-300 rounded animate-pulse"></div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <div className="h-10 w-10 bg-gray-300 rounded-full animate-pulse"></div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                : Array.isArray(tecket) &&
+                  tecket?.map((item, index) => (
+                    <tr key={tecket?.length + index} className="table_tr">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {total?.totalItems -
+                          ((currentPage - 1) * itemsPerPage + index)}
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        {item?.created_at
+                          ? moment(item?.created_at).format("DD MMM YYYY")
+                          : ""}
+                        <br />
+                        {item?.created_at
+                          ? moment(item?.created_at).format("hh:mm A")
+                          : ""}
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        {item?.business_name}
+                      </td>
+                      <td className="p-4 whitespace-nowrap">
+                        {item?.track_id}
+                      </td>
+                      <td className="p-4 max-w-[200px]">{item?.subject}</td>
+                      <td className="p-4 ">{item?.status}</td>
+                      <td className="p-4 ">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setSupportReplyMessage(item)}
+                            className=" text-xl w-fit text-white bg-blue-500 hover:bg-blue-800 rounded-[4px]  p-2 flex items-center gap-1"
+                          >
+                            <FaEye />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
             </Table>
 
             <TableFooter

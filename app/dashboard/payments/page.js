@@ -61,10 +61,10 @@ function PaymentCopy() {
 
   useEffect(() => {
     getPayLink();
-  }, []);
+  }, [storesUser?.api_id]);
 
   const getPayLink = async () => {
-    if (storeLoading) return;
+    if (!storesUser?.api_id) return;
     setLoading(true);
     const response = await ApiRequest({
       url: `/v1/pay_with_link${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}`,
@@ -121,6 +121,11 @@ function PaymentCopy() {
   const visibleLink = link?.slice(startIndex, startIndex + itemsPerPage);
 
   const [payment, setPayment] = useState([]);
+  
+
+  useEffect(() => {
+    getPaymentSetting();
+  }, []);
   const getPaymentSetting = async () => {
     try {
       const response = await ApiRequest({
@@ -132,10 +137,6 @@ function PaymentCopy() {
       // console.log(error);
     }
   };
-
-  useEffect(() => {
-    getPaymentSetting();
-  }, []);
 
   const modalRef = useRef();
 

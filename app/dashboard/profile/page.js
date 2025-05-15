@@ -10,6 +10,7 @@ import Cookies from "js-cookie";
 import { FaSpinner } from "react-icons/fa6";
 import InputFiledLabel from "../(dashboard_Component)/InputFiledLabel";
 import ApiRequest from "@/app/lib/Api_request";
+import { validatePhoneNumber } from "@/app/lib/formatAndValidatePhoneNumber";
 
 const EditProfilePage = () => {
   const [name, setName] = useState("");
@@ -161,10 +162,10 @@ const EditProfilePage = () => {
   };
 
   const handleSubmit = async () => {
-    if (!validateForm()) {
-      // Object.values(errors).forEach((error) => {
-      //   toast.error(error);
-      // });
+    if (!validateForm()) return;
+    const phoneValidation = validatePhoneNumber(phoneCode, phone);
+    if (!phoneValidation.isValid) {
+      setErrors({ phone: phoneValidation.error });
       return;
     }
     const formData = new FormData();
@@ -173,7 +174,7 @@ const EditProfilePage = () => {
     formData.append("name", name);
     formData.append("email", email);
     formData.append("country", countryId);
-    formData.append("phone", phoneCode + phone);
+    formData.append("phone", phoneValidation.formattedPhone);
     if (profileImage) {
       formData.append("avatar", profileImage);
     }
