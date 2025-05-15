@@ -115,7 +115,7 @@ function PaymentPage() {
   const handleONchange = (e) => {
     const file = e.target.files[0];
     const fileInput = document.getElementById("icon");
-
+  
     if (file) {
       const allowedExtensions = [
         ".png",
@@ -131,10 +131,10 @@ function PaymentPage() {
         /<script/i,
         /<\/script>/i,
         /<html/i,
-        /<\w+.*>/i,
+        /<!DOCTYPE html>/i,
       ];
       const fileName = file.name.toLowerCase();
-
+  
       // Extension check
       const hasValidExtension = allowedExtensions.some((ext) =>
         fileName.endsWith(ext)
@@ -146,7 +146,7 @@ function PaymentPage() {
         setCompanyLogo(null);
         return;
       }
-
+  
       // MIME type check
       if (!file.type.startsWith("image/")) {
         toast.error("Invalid image file type!", { autoClose: 3000 });
@@ -155,14 +155,18 @@ function PaymentPage() {
         setCompanyLogo(null);
         return;
       }
-
-      // File content check
+  
       const reader = new FileReader();
+  
       reader.onload = function (event) {
-        const fileContent = event.target.result;
+        const result = event.target.result;
+  
+        // Text content detect করার জন্য আমরা প্রথম 2000 character নেয়
+        const textSnippet = new TextDecoder("utf-8").decode(result.slice(0, 2000));
         const isCodeInjected = forbiddenPatterns.some((pattern) =>
-          pattern.test(fileContent)
+          pattern.test(textSnippet)
         );
+  
         if (isCodeInjected) {
           toast.error("Image file contains suspicious code!", {
             autoClose: 3000,
@@ -172,17 +176,18 @@ function PaymentPage() {
           setCompanyLogo(null);
           return;
         }
-
+  
         // ✅ Passed all checks
         setCompanyImages(file);
         const url = URL.createObjectURL(file);
         setCompanyLogo(url);
       };
-
-      // Try to read image as text to detect embedded code
-      reader.readAsText(file);
+  
+      // সব image file কেই binary হিসেবে পড়ে
+      reader.readAsArrayBuffer(file);
     }
   };
+  
 
   const handleAgentToggle = async (e) => {
     const formData = new FormData();
