@@ -119,8 +119,8 @@ export default function Production() {
     return item?.user_id == user?.id;
   });
   return (
-    <div className="mt-5 bg-white">
-      {user?.roles?.some((role) => role.name === "Admin") && (
+    <div className="bg-white">
+      {/*  {user?.roles?.some((role) => role.name === "Admin") && (
         <div className="px-3">
           <div className="w-full border border-gray-200 p-3 rounded-md flex items-center justify-between flex-wrap gap-2">
             <h3 className="text-xl font-semibold"> API keys</h3>
@@ -130,51 +130,31 @@ export default function Production() {
               </span>
             </Link>
           </div>
-          {Array.isArray(filteredData) && filteredData?.length > 0 && (
-            <div className="py-5">
-              <FilterStatus
-                showMerchantStatus={showPaymentType}
-                setShowMerchantStatus={setShowPaymentType}
-                setSearchMerchantStatus={setPaymentType}
-                searchMerchantStatus={paymentType ? paymentType : ""}
-                id="setShowPaymentType"
-                placeholderText="Merchant API..."
-              >
-                {["Own Merchant API", "Merchant API"]?.map((item, index) => (
-                  <div
-                    key={index}
-                    className="px-2 py-2 lg:py-2 lg:px-3 text-black cursor-pointer hover:bg-gradient-to-r from-[#395BEF] to-[#5C28D5] hover:text-white w-full justify-between"
-                    onClick={() => {
-                      setPaymentType(item);
-                      setShowPaymentType(false);
-                    }}
-                  >
-                    <span>{item}</span>
-                  </div>
-                ))}
-              </FilterStatus>
-            </div>
-          )}
+          
         </div>
-      )}
-      {data === null && (
-        <div className="overflow-x-auto px-3">
-          <div className="m-5">
-            <h1>
-              {" "}
-              For Live key Please Apply Merchant{" "}
-              <button
-                onClick={() => {
-                  setIsDrawerOpen(true);
-                }}
-                className="button text-bold text-blue-500"
-              >
-                Apply
-              </button>
-            </h1>
-          </div>
+      )} */}
+
+      <div className="overflow-x-auto">
+        <div className="m-6 flex items-center justify-between">
+          <h1 className="text-xl font-semibold">
+            {" "}
+            Get live key by applying for a store{" "}
+            <button
+              onClick={() => {
+                setIsDrawerOpen(true);
+              }}
+              className="button text-bold text-blue-500 border-b-2 border-transparent hover:border-b-blue-500 cursor-pointer"
+            >
+              Apply
+            </button>
+          </h1>
+          <Link className="" href="/documentations" prefetch={false}>
+            <span className="text-[#2F65EC] font-medium flex items-center border-b-2 border-transparent hover:border-b-blue-500 cursor-pointer">
+              API Documentation <IoIosArrowRoundForward fontSize={20} />
+            </span>
+          </Link>
         </div>
-      )}
+      </div>
       <Table headers={headers}>
         {Array.isArray(filteredData) &&
           filteredData?.map((item, index) => (
@@ -183,21 +163,32 @@ export default function Production() {
                 {" "}
                 {data?.length - index}
               </td>
+              <td className="p-4  whitespace-nowrap">
+                {item?.created_at && format(item?.created_at, "dd MMM yyyy")}
+              </td>
               <td className="p-4 min-w-[200px]">{item?.business_name}</td>
               <td className="p-4  whitespace-nowrap">{item?.name}</td>
               <td className="p-4">{item?.email}</td>
               <td className="p-4">{item?.phone}</td>
               <td className="p-4">
-                {item?.confirmed == 0
-                  ? "pending"
-                  : item?.confirmed == 1
-                  ? "Active"
-                  : item?.confirmed == 2
-                  ? "Rejected"
-                  : ""}
-              </td>
-              <td className="p-4  whitespace-nowrap">
-                {item?.created_at && format(item?.created_at, "dd MMM yyyy")}
+                <div
+                  className={`px-2 py-0.5 rounded flex items-center cursor-pointer transition-colors duration-200 gap-2 w-fit ${
+                    {
+                      1: "bg-green-700 hover:bg-green-800 text-white ",
+                      0: "bg-[#ff7654] hover:bg-[#da5737] text-white ",
+                      2: "bg-red-600 hover:bg-red-800 text-white ",
+                    }[item?.confirmed] ||
+                    "bg-gray-200 hover:bg-gray-300 text-gray-800 "
+                  }`}
+                >
+                  {item?.confirmed == 0
+                    ? "pending"
+                    : item?.confirmed == 1
+                    ? "Active"
+                    : item?.confirmed == 2
+                    ? "Rejected"
+                    : ""}
+                </div>
               </td>
             </tr>
           ))}

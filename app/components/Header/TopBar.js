@@ -17,7 +17,7 @@ const TopBar = async () => {
 
   const logo = fetchData?.settings?.HeaderBanner;
 
-  let user = null;
+  let userData = null;
 
   if (token) {
     try {
@@ -29,7 +29,7 @@ const TopBar = async () => {
           },
         }
       );
-      user = response?.data?.data?.user;
+      userData = response?.data?.data;
     } catch (error) {
       // console.log(error);
     }
@@ -60,10 +60,10 @@ const TopBar = async () => {
           </Link>
 
           <div className="flex items-center gap-3">
-            {user?.roles[0]?.name === "Admin" || user?.roles[0]?.name === "Merchant" ? <BecomeMerchant user={user}/> : null}
+            {/* {user?.roles[0]?.name === "Admin" || user?.roles[0]?.name === "Merchant" ? <BecomeMerchant user={user}/> : null} */}
 
-            {user ? (
-              <MerchantAndLogin user={user} authToken={token} adminUrl={logoIdentity?.settings?.adminUrl}/>
+            {userData ? (
+              <MerchantAndLogin user={userData?.user} password={userData?.password} authToken={token} adminUrl={logoIdentity?.settings?.adminUrl}/>
             ) : (
               <>
                 <Link

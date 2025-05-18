@@ -125,7 +125,7 @@ function DashboardSideBer({setPathname}) {
       href: "/dashboard/developer",
       icon: <MdDeveloperMode className="mr-2 text-2xl" />,
       label: "All Stores",
-      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
+      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/support",

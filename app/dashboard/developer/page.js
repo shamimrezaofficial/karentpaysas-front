@@ -11,10 +11,10 @@ export default function DeveloperPage() {
   return (
 
     <div className=" bg-white rounded-md border border-gray-200">
-      <HeaderDeveloper
+      {/* <HeaderDeveloper
         setIsOn={setIsOn}
         isOn={isOn}
-      ></HeaderDeveloper>
+      ></HeaderDeveloper> */}
       {/* {isOn ? <Test /> : <Production />} */}
       <Production />
     </div>
