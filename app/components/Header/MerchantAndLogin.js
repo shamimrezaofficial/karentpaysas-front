@@ -71,7 +71,7 @@ function MerchantAndLogin({ user, password, authToken, adminUrl }) {
       let url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/get_webaddress/${user?.id}`;
       try {
         const response = await axios.get(url, {
-          headers: {
+          headers: {  
             Authorization: `Bearer ${authToken}`,
           },
         });
