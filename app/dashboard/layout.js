@@ -1,7 +1,14 @@
 
 import DashboardSideBer from "./(dashboard_Component)/DashboardSideBer";
+import { GetCookies } from "@/app/lib/cookiesSetting";
+import { redirect } from "next/navigation";
 
 export default async function  LoginLayout({ children }) {
+  const token = await GetCookies({ name: "auth_token_font" });
+
+  if (!token) {
+    redirect("/");
+  }
   
   return (
     <>
