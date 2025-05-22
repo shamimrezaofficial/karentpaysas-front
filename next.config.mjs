@@ -21,7 +21,6 @@ const nextConfig = {
   experimental: {
     allowFutureImage: true,
   },
-  turbo: false,
   webpack: (config) => {
     config.cache = {
       type: 'filesystem', 
