@@ -7,17 +7,17 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "**",
-        pathname: "**",
       },
       {
         protocol: "http",
         hostname: "**",
-        pathname: "**",
       },
     ],
   },
   reactStrictMode: true,
   swcMinify: true,
+  poweredByHeader: false,
+  compress: true,
   webpack: (config) => {
     config.cache = {
       type: 'filesystem',
