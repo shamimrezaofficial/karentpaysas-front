@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { Inter } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "./globals.css";
+import "./global.css";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import MobileMenu from "./components/MobileMenu/MobileMenu";
