@@ -60,48 +60,48 @@ function DashboardPage() {
       link: "/dashboard/payments",
     },
     {
-      transaction: allbalance?.balance?.total_deposit_credit || 0.0,
-      title: "Total Deposit Credit",
+      transaction:  allbalance?.total_deposit_amount || 0.0,
+      title: "Total Deposit Amount",
       color: "text-yellow-500",
       gridSize: "md:col-span-3",
       icon: MdArrowDownward,
       link: "/dashboard/cash-in",
     },
     {
-      transaction: allbalance?.balance?.total_deposit_debit || 0.0,
-      title: "Total Deposit Debit",
+      transaction:  allbalance?.total_deposit_fee || 0.0,
+      title: "Total Deposit Fee",
       color: "text-blue-500",
       gridSize: "md:col-span-3",
       icon: MdArrowUpward,
       link: "/dashboard/cash-in",
     },
     {
-      transaction: allbalance?.balance?.total_payout_credit || 0.0,
-      title: "Total Payout Credit",
+      transaction: allbalance?.total_payout_amount || 0.0,
+      title: "Total Payout Amount",
       color: "text-purple-500",
       gridSize: "md:col-span-3",
       icon: MdTrendingUp,
       link: "/dashboard/payout",
     },
     {
-      transaction: allbalance?.balance?.total_payout_debit || 0.0,
-      title: "Total Payout Debit",
+      transaction: allbalance?.total_payout_fee || 0.0,
+      title: "Total Payout Fee",
       color: "text-yellow-500",
       gridSize: "md:col-span-3",
       icon: MdTrendingDown,
       link: "/dashboard/payout",
     },
     {
-      transaction: allbalance?.balance?.total_settlement_credit || 0.0,
-      title: "Total Settlement Credit",
+      transaction: allbalance?.total_settlement_amount || 0.0,
+      title: "Total Settlement Amount",
       color: "text-green-700",
       gridSize: "md:col-span-3",
       icon: MdAttachMoney,
       link: "/dashboard/settlement",
     },
     {
-      transaction: allbalance?.balance?.total_settlement_debit || 0.0,
-      title: "Total Settlement Debit",
+      transaction: allbalance?.total_settlement_fee || 0.0,
+      title: "Total Settlement Fee",
       color: "text-purple-500",
       gridSize: "md:col-span-3",
       icon: MdCreditCard,
@@ -140,6 +140,7 @@ function DashboardPage() {
       link: "/dashboard/payout",
     },
   ];
+
   const adminBalanceItems = [
     {
       transaction: 0.0,
@@ -150,7 +151,7 @@ function DashboardPage() {
     },
     {
       transaction: 0.0,
-      title: "Total Merchant",
+      title: "Total Store",
       color: "text-green-500",
       gridSize: "md:col-span-3",
       icon: MdCreditCard,
@@ -177,6 +178,7 @@ function DashboardPage() {
       icon: MdAttachMoney,
     },
   ];
+
   return (
     <section className="text-white shadow-md rounded border border-gray-200">
       <div className="p-6">
