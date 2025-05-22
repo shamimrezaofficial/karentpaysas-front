@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { Rubik } from "next/font/google";
+import { Inter } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
@@ -8,7 +8,7 @@ import Footer from "./components/Footer/Footer";
 import MobileMenu from "./components/MobileMenu/MobileMenu";
 import LiveChart from "./LiveChart/LiveChart";
 
-const rubik = Rubik({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"] });
 
 export default async function RootLayout({ children }) {
   let backgroundImageStyle = {
@@ -45,7 +45,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${rubik.className}`}
+        className={`${inter.className}`}
         style={backgroundImageStyle}
         cz-shortcut-listen="true"
       >
