@@ -2,7 +2,7 @@
 
 import Cookies from "js-cookie";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   MdSpaceDashboard,
@@ -10,34 +10,22 @@ import {
   MdPayments,
   MdAccountBalance,
   MdBalance,
+  MdDeveloperMode,
 } from "react-icons/md";
 import { FaMoneyCheckAlt, FaHandsHelping, FaUserCog } from "react-icons/fa";
 import { HiDocumentReport } from "react-icons/hi";
-import { IoSettings } from "react-icons/io5";
-import { MdDeveloperMode } from "react-icons/md";
-import useFetchingData from "@/app/lib/useFetchingData";
-import useUserData from "@/app/lib/useUserData";
 import { TbWorldDown } from "react-icons/tb";
 import { RiSecurePaymentFill } from "react-icons/ri";
 
-function DashboardSideBer({setPathname}) {
+import useFetchingData from "@/app/lib/useFetchingData";
+
+function DashboardSideBer() {
   const [scrollDirection, setScrollDirection] = useState("up");
   const token = Cookies.get("auth_token_font");
   const [storesUser, setStoresUser] = useState(null);
 
-  const { user } = useUserData();
   const pathname = usePathname();
-  const router = useRouter();
 
-  const redirect = (path) => {
-    router.push(path);
-  };
-
-  useEffect(() => {
-    if (!token) {
-      redirect("/auth/login");
-    }
-  }, [token, router]);
 
   const [isGradient, setIsGradient] = useState(false);
   const { fetchData } = useFetchingData("/api/front/setting/color-setting");
@@ -45,11 +33,9 @@ function DashboardSideBer({setPathname}) {
   const [color1, setColor1] = useState("");
   const [color2, setColor2] = useState("");
 
+  // set gradient colors from settings
   useEffect(() => {
-    if (
-      fetchData?.settings?.GradientColor1 &&
-      fetchData?.settings?.GradientColor2
-    ) {
+    if (fetchData?.settings?.GradientColor1 && fetchData?.settings?.GradientColor2) {
       setColor1(fetchData.settings.GradientColor1);
       setColor2(fetchData.settings.GradientColor2);
       setIsGradient(true);
@@ -60,13 +46,27 @@ function DashboardSideBer({setPathname}) {
     }
   }, [fetchData]);
 
+  // get store info from localStorage
   useEffect(() => {
-    const store = JSON.parse(localStorage.getItem("store"));
-    if (store) {
-      setStoresUser(store);
+    // use requestIdleCallback if available to reduce load blocking
+    const loadStore = () => {
+      try {
+        const store = JSON.parse(localStorage.getItem("store"));
+        if (store) setStoresUser(store);
+      } catch (err) {
+        console.error("Invalid store data in localStorage");
+      }
+    };
+  
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(loadStore);
+    } else {
+      setTimeout(loadStore, 0);
     }
   }, []);
+  
 
+  // detect scroll direction
   useEffect(() => {
     let lastScrollY = window.scrollY;
     const handleScroll = () => {
@@ -82,90 +82,79 @@ function DashboardSideBer({setPathname}) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const hasRole = (roleNames = []) =>
-    user?.roles?.some((role) => roleNames.includes(role.name));
   const menuItems = [
     {
       href: "/dashboard",
       icon: <MdSpaceDashboard className="mr-2 text-2xl" />,
       label: "Dashboard",
-      roles: ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/cash-in",
-      icon: <MdAccountBalanceWallet className="mr-2 text-2xl" />,
-      label: "Deposit",
-      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
-    },
-    {
-      href: "/dashboard/payout",
-      icon: <FaMoneyCheckAlt className="mr-2 text-2xl" />,
-      label: "Payout",
-      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
     },
     {
       href: "/dashboard/settlement",
       icon: <MdBalance className="mr-2 text-2xl" />,
       label: "Settlement",
-      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
-    },
-    {
-      href: "/dashboard/payments",
-      icon: <MdPayments className="mr-2 text-2xl" />,
-      label: "Payments",
-      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
-    },
-    {
-      href: "/dashboard/statement",
-      icon: <MdAccountBalance className="mr-2 text-2xl" />,
-      label: "Statement Balance",
-      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
     },
     {
       href: "/dashboard/developer",
       icon: <MdDeveloperMode className="mr-2 text-2xl" />,
       label: "All Stores",
-      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/support",
       icon: <FaHandsHelping className="mr-2 text-2xl" />,
       label: "Support",
-      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/reports",
       icon: <HiDocumentReport className="mr-2 text-2xl" />,
       label: "Reports",
-      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/profile",
       icon: <FaUserCog className="mr-2 text-2xl" />,
       label: "Profile",
-      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
     },
     {
       href: "/dashboard/allowed_ip",
       icon: <TbWorldDown className="mr-2 text-2xl" />,
       label: "Allowed IP",
-      roles: storesUser?.api_id ? [] : ["Merchant", "Admin"],
+    },
+  ];
+
+  const menuItemsStore = [
+    {
+      href: "/dashboard",
+      icon: <MdSpaceDashboard className="mr-2 text-2xl" />,
+      label: "Dashboard",
+    },
+    {
+      href: "/dashboard/cash-in",
+      icon: <MdAccountBalanceWallet className="mr-2 text-2xl" />,
+      label: "Deposit",
+    },
+    {
+      href: "/dashboard/payout",
+      icon: <FaMoneyCheckAlt className="mr-2 text-2xl" />,
+      label: "Payout",
+    },
+    {
+      href: "/dashboard/payments",
+      icon: <MdPayments className="mr-2 text-2xl" />,
+      label: "Payments",
+    },
+    {
+      href: "/dashboard/statement",
+      icon: <MdAccountBalance className="mr-2 text-2xl" />,
+      label: "Statement Balance",
     },
     {
       href: "/dashboard/payment_page",
       icon: <RiSecurePaymentFill className="mr-2 text-2xl" />,
       label: "Payment Page",
-      roles: storesUser?.api_id ? ["Merchant", "Admin"] : [],
     },
   ];
 
-  const visibleMenu = menuItems.filter((item) => hasRole(item.roles));
-  useEffect(() => {
-    const checkPathname = visibleMenu.find((item) => item.href === pathname);
-    if (!checkPathname) {
-      redirect("/dashboard");
-    }
-  }, [pathname]);
+  const menuToRender = storesUser?.api_id ? menuItemsStore : menuItems || [];
+
   return (
     <div
       className={`hidden lg:block lg:w-[300px] mr-5 mt-10 rounded-md ${
@@ -173,15 +162,13 @@ function DashboardSideBer({setPathname}) {
       }`}
       style={{
         background: isGradient
-          ? `linear-gradient(to bottom, ${color1 || "#3b82f6"}, ${
-              color2 || "#9333ea"
-            })`
+          ? `linear-gradient(to bottom, ${color1 || "#3b82f6"}, ${color2 || "#9333ea"})`
           : "#ffffff",
       }}
     >
       <aside className="px-4 mt-5">
         <ul>
-          {visibleMenu.map((item) => (
+          {menuToRender?.map((item) => (
             <MenuItem
               key={item.href}
               href={item.href}

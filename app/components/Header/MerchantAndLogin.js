@@ -1,13 +1,11 @@
 "use client";
 import { deleteCookies } from "@/app/lib/cookiesSetting";
 import axios from "axios";
-import Cookies from "js-cookie";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
-import ApiRequest from "@/app/lib/Api_request";
 
 function MerchantAndLogin({ user, password, authToken, adminUrl }) {
   const [dropdownDefaultButton, setDropdownDefaultButton] = useState(false);
@@ -33,7 +31,7 @@ function MerchantAndLogin({ user, password, authToken, adminUrl }) {
     }
     const deleteToken = await deleteCookies({ name: "auth_token_font" });
     if (deleteToken) {
-      location.reload(true);
+      router.push("/");
       toast.success("Successfully Logged Out");
     }
   };
@@ -51,16 +49,6 @@ function MerchantAndLogin({ user, password, authToken, adminUrl }) {
     };
   }, []);
   const loginAdmin = async (user) => {
-    /* const response = await ApiRequest({
-      url: `/admin/impersonate/${user?.id}`,
-      method: "get",
-    });
-    if (response?.status === 200) {
-      if (response.data) {
-      }
-    } else {
-      toast.error(response?.message || "Failed to login. Please try again.");
-    } */
     const redirectUrl = `${adminUrl}/login?email=${user?.email}&password=${password}`;
     window.open(redirectUrl, "_blank");
   };
@@ -82,7 +70,6 @@ function MerchantAndLogin({ user, password, authToken, adminUrl }) {
         setStoresUser(response?.data?.data);
       } catch (error) {
         console.error("Error fetching deposit methods:", error);
-        // toast.error("Failed to fetch merchant cash-in data. Please try again.");
       }
     };
     getAllStore();
@@ -149,8 +136,8 @@ function MerchantAndLogin({ user, password, authToken, adminUrl }) {
                     prefetch={false}
                     onClick={() => {
                       localStorage.removeItem("store");
-                      window.location.reload(true);
                       router.push("/dashboard");
+                      window.location.reload(true);
                     }}
                     className="block px-4 py-2 hover:bg-[#4944E3] hover:text-white rounded-t-lg "
                   >
@@ -162,6 +149,7 @@ function MerchantAndLogin({ user, password, authToken, adminUrl }) {
                     <button
                       onClick={() => {
                         localStorage.setItem("store", JSON.stringify(store));
+                        router.push("/dashboard");
                         window.location.reload(true);
                       }}
                       className="px-4 py-2 hover:bg-[#4944E3] hover:text-white cursor-pointer text-left w-full grid grid-cols-1 break-words"

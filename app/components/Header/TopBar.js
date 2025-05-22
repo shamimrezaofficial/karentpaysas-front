@@ -4,7 +4,6 @@ import Link from "next/link";
 import MerchantAndLogin from "./MerchantAndLogin";
 import { GetCookies } from "@/app/lib/cookiesSetting";
 import { fetchingDataGet } from "@/app/lib/fetchingDataGet";
-import BecomeMerchant from "../BecomeMerchant/BecomeMerchant";
 
 const TopBar = async () => {
   const token = await GetCookies({ name: "auth_token_font" });

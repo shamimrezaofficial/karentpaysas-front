@@ -24,17 +24,19 @@ function DashboardPage() {
       setStoresUser(store);
     }
     setStoreLoading(false);
-  }, [])
+  }, []);
 
   useEffect(() => {
     getallBalance();
-  }, [storesUser]);
+  }, [storeLoading]);
 
   const getallBalance = async () => {
     if (storeLoading) return;
     setLoading(true);
     const response = await ApiRequest({
-      url: `/marchent_balance${storesUser?.api_id ? `/${storesUser?.api_id}` : ""}`,
+      url: `/marchent_balance${
+        storesUser?.api_id ? `/${storesUser?.api_id}` : ""
+      }`,
       method: "get",
     });
     if (response?.status == 200) {
@@ -60,7 +62,7 @@ function DashboardPage() {
       link: "/dashboard/payments",
     },
     {
-      transaction:  allbalance?.total_deposit_amount || 0.0,
+      transaction: allbalance?.total_deposit_amount || 0.0,
       title: "Total Deposit Amount",
       color: "text-yellow-500",
       gridSize: "md:col-span-3",
@@ -68,7 +70,7 @@ function DashboardPage() {
       link: "/dashboard/cash-in",
     },
     {
-      transaction:  allbalance?.total_deposit_fee || 0.0,
+      transaction: allbalance?.total_deposit_fee || 0.0,
       title: "Total Deposit Fee",
       color: "text-blue-500",
       gridSize: "md:col-span-3",
@@ -143,42 +145,65 @@ function DashboardPage() {
 
   const adminBalanceItems = [
     {
-      transaction: 0.0,
+      transaction: allbalance?.balance?.main_balance || 0.0,
       title: "Total Balance",
       color: "text-blue-500",
       gridSize: "md:col-span-3 bg-gray-50",
       icon: MdAccountBalanceWallet,
     },
     {
-      transaction: 0.0,
-      title: "Total Store",
+      transaction: allbalance?.total_store || 0.0,
+      title: "Total Active Store",
       color: "text-green-500",
       gridSize: "md:col-span-3",
       icon: MdCreditCard,
     },
     {
-      transaction: 0.0,
-      title: "Total Deposit",
+      transaction: allbalance?.total_deposit_amount || 0.0,
+      title: "Total Deposit Amount",
       color: "text-yellow-500",
       gridSize: "md:col-span-3",
       icon: MdArrowDownward,
     },
     {
-      transaction: 0.0,
-      title: "Total Payout",
+      transaction: allbalance?.total_deposit_fee || 0.0,
+      title: "Total Deposit Fee",
+      color: "text-blue-500",
+      gridSize: "md:col-span-3",
+      icon: MdArrowUpward,
+      link: "/dashboard/cash-in",
+    },
+    {
+      transaction: allbalance?.total_payout_amount || 0.0,
+      title: "Total Payout Amount",
+      color: "text-blue-500",
+      gridSize: "md:col-span-3",
+      icon: MdArrowUpward,
+      link: "/dashboard/cash-in",
+    },
+    {
+      transaction: allbalance?.total_payout_fee || 0.0,
+      title: "Total Payout Fee",
       color: "text-purple-500",
       gridSize: "md:col-span-3",
       icon: MdTrendingUp,
     },
     {
-      transaction: 0.0,
-      title: "Total Settlement",
+      transaction: allbalance?.total_settlement_amount || 0.0,
+      title: "Total Settlement Amount",
+      color: "text-green-700",
+      gridSize: "md:col-span-3",
+      icon: MdAttachMoney,
+    },
+    {
+      transaction: allbalance?.total_settlement_fee || 0.0,
+      title: "Total Settlement Fee",
       color: "text-green-700",
       gridSize: "md:col-span-3",
       icon: MdAttachMoney,
     },
   ];
-
+  console.log(allbalance);
   return (
     <section className="text-white shadow-md rounded border border-gray-200">
       <div className="p-6">
