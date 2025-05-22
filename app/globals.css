@@ -98,7 +98,6 @@ html {
   background-color: #f0f0f0;
 }
 
-/* reusable table tr component background color */
 .table_tr {
   background-color: white;
   border-bottom: 1px solid #e5e7eb;
