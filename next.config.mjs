@@ -18,12 +18,9 @@ const nextConfig = {
   },
   reactStrictMode: true,
   swcMinify: true,
-  experimental: {
-    allowFutureImage: true,
-  },
   webpack: (config) => {
     config.cache = {
-      type: 'filesystem', 
+      type: 'filesystem',
       maxAge: 60 * 60 * 1000,
     };
     return config;
